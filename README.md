@@ -1,56 +1,42 @@
-# Welcome to your Expo app 👋
+# Bâtiplace
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Le marketplace de la construction au Québec. Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels. Publication gratuite, zéro commission.
 
-## Get started
+Une seule base de code pour le site Web et l'application iPhone (Android ensuite).
 
-1. Install dependencies
+## Pile technique
 
-   ```bash
-   npm install
-   ```
+- **Expo (React Native) + Expo Router** : application iOS, Android et site Web (`src/app`).
+- **Supabase** : comptes, base Postgres + PostGIS (recherche par distance), photos (Storage), messagerie en temps réel. Schéma : `supabase/migrations`.
+- **RevenueCat** : abonnement Bâtiplace Illimité (14,99 $/mois) via l'App Store et Google Play. Le webhook `supabase/functions/revenuecat-webhook` tient la table `subscriptions` à jour, ce qui débloque aussi le site Web pour le même compte.
 
-2. Start the app
+## Règles d'affaires
 
-   ```bash
-   npx expo start
-   ```
+- Forfait gratuit : 2 annonces actives (appliqué par la base, trigger `enforce_listing_limit`).
+- Bâtiplace Illimité : annonces illimitées, 14,99 $/mois, acheté dans l'application.
+- Aucune commission sur les ventes.
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Démarrer
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env   # remplir l'URL et la clé publique Supabase
+npm run web            # site Web
+npm run ios            # nécessite un build de développement (RevenueCat utilise du code natif)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Vérifications : `npm run typecheck` et `npm run build:web`.
 
-### Other setup steps
+## Base de données
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+supabase link --project-ref <ref>
+supabase db push
+supabase functions deploy delete-account
+supabase functions deploy revenuecat-webhook --no-verify-jwt
+supabase secrets set REVENUECAT_WEBHOOK_SECRET=<valeur>
+```
 
-## Learn more
+## Publication iOS
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Avec EAS : `npx eas-cli@latest build --platform ios` puis `npx eas-cli@latest submit --platform ios`. Nécessite un compte Apple Developer et l'abonnement configuré dans App Store Connect (produit mensuel lié à l'entitlement `illimite` dans RevenueCat).

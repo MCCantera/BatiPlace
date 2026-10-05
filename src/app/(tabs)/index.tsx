@@ -1,0 +1,225 @@
+import { router } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { ListingCard } from '@/components/listing-card';
+import { Button, Chip, Empty, Icon, Loading, P } from '@/components/ui';
+import { CATEGORIES, CITY_NAMES, CONDITIONS } from '@/lib/catalog';
+import type { ListingCondition, SearchResult } from '@/lib/database.types';
+import { useFavorites } from '@/lib/favorites';
+import { useOrigin } from '@/lib/location';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
+import { MAX_WIDTH, radius, space, useTheme } from '@/lib/theme';
+
+const RADII = [10, 25, 50, 100, 250, 1500];
+const SORTS = [
+  { id: 'pertinence', label: 'Pertinence' },
+  { id: 'distance', label: 'Plus proches' },
+  { id: 'recent', label: 'Plus récentes' },
+  { id: 'prix', label: 'Prix croissant' },
+];
+
+export default function ExploreScreen() {
+  const t = useTheme();
+  const { width } = useWindowDimensions();
+  const { origin, radiusKm, setRadiusKm, setCity, useDeviceLocation } = useOrigin();
+  const favorites = useFavorites();
+  const [q, setQ] = useState('');
+  const [query, setQuery] = useState('');
+  const [cats, setCats] = useState<string[]>([]);
+  const [conds, setConds] = useState<ListingCondition[]>([]);
+  const [proOnly, setProOnly] = useState<boolean | null>(null);
+  const [sort, setSort] = useState('pertinence');
+  const [results, setResults] = useState<SearchResult[] | null>(null);
+  const [error, setError] = useState('');
+  const [picker, setPicker] = useState(false);
+
+  useEffect(() => {
+    const id = setTimeout(() => setQuery(q), 300);
+    return () => clearTimeout(id);
+  }, [q]);
+
+  const load = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setResults([]);
+      return;
+    }
+    setError('');
+    const { data, error: err } = await supabase.rpc('search_listings', {
+      lat: origin.lat,
+      lng: origin.lng,
+      radius_km: radiusKm,
+      q: query || null,
+      categories: cats.length ? cats : null,
+      conditions: conds.length ? conds : null,
+      pro_only: proOnly,
+      sort,
+    });
+    if (err) setError('Impossible de charger les annonces. Vérifiez votre connexion.');
+    setResults(data ?? []);
+  }, [origin, radiusKm, query, cats, conds, proOnly, sort]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const columns = width >= 1000 ? 4 : width >= 720 ? 3 : 2;
+  const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+
+  const header = (
+    <View style={{ gap: space.md, paddingBottom: space.md }}>
+      <View style={styles.brandRow}>
+        <View style={[styles.mark, { backgroundColor: t.accent }]}>
+          <Icon name="home" size={18} color="#fff" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 22, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
+            Bâti<Text style={{ color: t.brand }}>place</Text>
+          </Text>
+          <Text style={{ fontSize: 12, color: t.muted }}>Le marketplace de la construction au Québec</Text>
+        </View>
+      </View>
+
+      <View style={[styles.hero, { backgroundColor: t.accentSoft }]}>
+        <Text style={{ fontSize: 24, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
+          Le surplus des uns, <Text style={{ color: t.accent }}>le chantier des autres.</Text>
+        </Text>
+        <P muted>
+          Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et
+          professionnels, partout au Québec. Publication gratuite, zéro commission.
+        </P>
+      </View>
+
+      <View style={[styles.search, { backgroundColor: t.surface, borderColor: t.line }]}>
+        <Icon name="search" color={t.muted} />
+        <TextInput
+          value={q}
+          onChangeText={setQ}
+          placeholder="Céramique, gypse, scie à onglet…"
+          placeholderTextColor={t.muted}
+          style={{ flex: 1, fontSize: 16, color: t.text, paddingVertical: 10 }}
+          returnKeyType="search"
+          accessibilityLabel="Rechercher"
+        />
+      </View>
+
+      <View style={styles.row}>
+        <Pressable onPress={() => setPicker(true)} style={[styles.locBtn, { borderColor: t.line, backgroundColor: t.surface }]}>
+          <Icon name={origin.fromDevice ? 'navigate' : 'location-outline'} color={t.brand} />
+          <Text style={{ color: t.text, fontWeight: '600' }}>{origin.label}</Text>
+          <Icon name="chevron-down" size={14} color={t.muted} />
+        </Pressable>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+          {RADII.map((r) => (
+            <Chip key={r} label={r >= 1500 ? 'Tout le Québec' : `${r} km`} selected={radiusKm === r} onPress={() => setRadiusKm(r)} />
+          ))}
+        </ScrollView>
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+        <Chip label="Tout" selected={cats.length === 0} onPress={() => setCats([])} />
+        {CATEGORIES.map((c) => (
+          <Chip key={c.id} label={c.name} dot={c.ink} selected={cats.includes(c.id)} onPress={() => setCats(toggle(cats, c.id))} />
+        ))}
+      </ScrollView>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+        {CONDITIONS.map((c) => (
+          <Chip key={c.id} label={c.label} selected={conds.includes(c.id)} onPress={() => setConds(toggle(conds, c.id))} />
+        ))}
+        <Chip label="Particuliers" selected={proOnly === false} onPress={() => setProOnly(proOnly === false ? null : false)} />
+        <Chip label="Professionnels" selected={proOnly === true} onPress={() => setProOnly(proOnly === true ? null : true)} />
+      </ScrollView>
+
+      <View style={[styles.row, { justifyContent: 'space-between' }]}>
+        <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flexShrink: 0 }}>
+          {results ? `${results.length} annonce${results.length > 1 ? 's' : ''}` : ' '}
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.xs }}>
+          {SORTS.map((s) => (
+            <Pressable key={s.id} onPress={() => setSort(s.id)} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+              <Text style={{ color: sort === s.id ? t.accent : t.muted, fontWeight: sort === s.id ? '700' : '500', fontSize: 13 }}>{s.label}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+      {error ? <P style={{ color: t.danger }}>{error}</P> : null}
+    </View>
+  );
+
+  return (
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: t.bg }}>
+      <FlatList
+        key={columns}
+        data={results ?? []}
+        numColumns={columns}
+        keyExtractor={(l) => l.id}
+        ListHeaderComponent={header}
+        contentContainerStyle={{ padding: space.lg, gap: space.md, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' }}
+        columnWrapperStyle={{ gap: space.md }}
+        refreshing={false}
+        onRefresh={load}
+        renderItem={({ item }) => (
+          <View style={{ flex: 1 / columns }}>
+            <ListingCard listing={item} favorite={favorites.ids.has(item.id)} onToggleFavorite={() => favorites.toggle(item.id)} />
+          </View>
+        )}
+        ListEmptyComponent={
+          results === null ? (
+            <Loading />
+          ) : (
+            <Empty
+              title={isSupabaseConfigured ? 'Aucune annonce ne correspond' : 'Base de données pas encore branchée'}
+              body={isSupabaseConfigured ? 'Élargissez le rayon ou retirez un filtre. Ou soyez le premier à publier ici.' : 'Ajoutez EXPO_PUBLIC_SUPABASE_URL et EXPO_PUBLIC_SUPABASE_KEY dans .env.'}
+              action={<Button label="Publier une annonce" icon="add" onPress={() => router.push('/publier')} />}
+            />
+          )
+        }
+      />
+
+      <Modal visible={picker} transparent animationType="fade" onRequestClose={() => setPicker(false)}>
+        <Pressable style={styles.overlay} onPress={() => setPicker(false)}>
+          <Pressable style={[styles.sheet, { backgroundColor: t.surface }]}>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: t.text }}>Rechercher autour de</Text>
+            <Button
+              label="Utiliser ma position"
+              icon="navigate"
+              kind="brand"
+              onPress={async () => {
+                const ok = await useDeviceLocation();
+                if (ok) setPicker(false);
+              }}
+            />
+            <ScrollView style={{ maxHeight: 360 }}>
+              {CITY_NAMES.map((c) => (
+                <Pressable
+                  key={c}
+                  onPress={() => {
+                    setCity(c);
+                    setPicker(false);
+                  }}
+                  style={[styles.cityRow, { borderColor: t.line }]}>
+                  <Text style={{ color: t.text, fontSize: 16, fontWeight: origin.label === c ? '700' : '400' }}>{c}</Text>
+                  {origin.label === c ? <Icon name="checkmark" color={t.accent} /> : null}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  mark: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
+  hero: { borderRadius: radius.lg, padding: space.lg, gap: space.sm },
+  search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: space.lg },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  locBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: space.lg },
+  sheet: { borderRadius: radius.lg, padding: space.lg, gap: space.md, width: '100%', maxWidth: 440, alignSelf: 'center' },
+  cityRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth },
+});

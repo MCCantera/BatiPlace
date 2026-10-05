@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "batiplace",
+    "name": "Bâtiplace",
     "slug": "batiplace",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,29 +8,52 @@
     "scheme": "batiplace",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "ca.batiplace.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Bâtiplace utilise votre position pour afficher les annonces près de chez vous.",
+        "NSPhotoLibraryUsageDescription": "Bâtiplace accède à vos photos pour illustrer vos annonces.",
+        "NSCameraUsageDescription": "Bâtiplace utilise l’appareil photo pour photographier les articles que vous vendez.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FF6A3D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "ca.batiplace.app"
     },
     "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Bâtiplace"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#FF6A3D",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Bâtiplace accède à vos photos pour illustrer vos annonces.",
+          "cameraPermission": "Bâtiplace utilise l’appareil photo pour photographier les articles que vous vendez."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Bâtiplace utilise votre position pour afficher les annonces près de chez vous."
         }
       ]
     ],
