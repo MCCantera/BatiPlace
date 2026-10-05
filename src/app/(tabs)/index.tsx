@@ -35,10 +35,7 @@ export default function ExploreScreen() {
   const [error, setError] = useState('');
   const [picker, setPicker] = useState(false);
 
-  useEffect(() => {
-    const id = setTimeout(() => setQuery(q), 300);
-    return () => clearTimeout(id);
-  }, [q]);
+  const runSearch = () => setQuery(q.trim());
 
   const load = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -71,13 +68,13 @@ export default function ExploreScreen() {
     <View style={{ gap: space.md, paddingBottom: space.md }}>
       <View style={styles.brandRow}>
         <View style={[styles.mark, { backgroundColor: t.accent }]}>
-          <Icon name="home" size={18} color="#fff" />
+          <Icon name="home" size={30} color="#fff" />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 22, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
+          <Text style={{ fontSize: 34, fontWeight: '800', color: t.text, letterSpacing: -0.8, lineHeight: 38 }}>
             Bâti<Text style={{ color: t.brand }}>place</Text>
           </Text>
-          <Text style={{ fontSize: 12, color: t.muted }}>Le marketplace de la construction au Québec</Text>
+          <Text style={{ fontSize: 15, color: t.muted }}>Le marketplace de la construction au Québec</Text>
         </View>
       </View>
 
@@ -95,13 +92,24 @@ export default function ExploreScreen() {
         <Icon name="search" color={t.muted} />
         <TextInput
           value={q}
-          onChangeText={setQ}
+          onChangeText={(v) => {
+            setQ(v);
+            if (!v.trim()) setQuery('');
+          }}
+          onSubmitEditing={runSearch}
           placeholder="Céramique, gypse, scie à onglet…"
           placeholderTextColor={t.muted}
-          style={{ flex: 1, fontSize: 16, color: t.text, paddingVertical: 10 }}
+          style={{ flex: 1, minWidth: 0, fontSize: 16, color: t.text, paddingVertical: 8 }}
           returnKeyType="search"
           accessibilityLabel="Rechercher"
         />
+        <Pressable
+          accessibilityRole="button"
+          onPress={runSearch}
+          style={({ pressed }) => [styles.searchBtn, { backgroundColor: t.accent }, pressed && { opacity: 0.85 }]}>
+          <Icon name="search" size={16} color={t.accentText} />
+          <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 15 }}>Rechercher</Text>
+        </Pressable>
       </View>
 
       <View style={styles.row}>
@@ -213,10 +221,11 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  mark: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  mark: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
   hero: { borderRadius: radius.lg, padding: space.lg, gap: space.sm },
-  search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: space.lg },
+  search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingLeft: space.lg, paddingRight: 5, paddingVertical: 5 },
+  searchBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 9 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   locBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: space.lg },
