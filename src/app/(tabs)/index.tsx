@@ -10,7 +10,7 @@ import type { ListingCondition, SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
 import { useOrigin } from '@/lib/location';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
-import { MAX_WIDTH, radius, space, useTheme } from '@/lib/theme';
+import { radius, space, useTheme } from '@/lib/theme';
 
 const RADII = [10, 25, 50, 100, 250, 1500];
 const SORTS = [
@@ -19,6 +19,17 @@ const SORTS = [
   { id: 'recent', label: 'Plus récentes' },
   { id: 'prix', label: 'Prix croissant' },
 ];
+
+// Rangée de filtres : défile à l'horizontale sur mobile, passe à la ligne sur ordinateur.
+function ChipRow({ wide, gap = space.sm, children }: { wide: boolean; gap?: number; children: React.ReactNode }) {
+  return wide ? (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap }}>{children}</View>
+  ) : (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap }}>
+      {children}
+    </ScrollView>
+  );
+}
 
 export default function ExploreScreen() {
   const t = useTheme();
@@ -61,7 +72,9 @@ export default function ExploreScreen() {
     load();
   }, [load]);
 
-  const columns = width >= 1000 ? 4 : width >= 720 ? 3 : 2;
+  // Sur ordinateur, la page prend toute la largeur.
+  const wide = width >= 1000;
+  const columns = width >= 1700 ? 6 : width >= 1400 ? 5 : wide ? 4 : width >= 720 ? 3 : 2;
   const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   const header = (
@@ -118,39 +131,39 @@ export default function ExploreScreen() {
           <Text style={{ color: t.text, fontWeight: '600' }}>{origin.label}</Text>
           <Icon name="chevron-down" size={14} color={t.muted} />
         </Pressable>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+        <ChipRow wide={wide}>
           {RADII.map((r) => (
             <Chip key={r} label={r >= 1500 ? 'Tout le Québec' : `${r} km`} selected={radiusKm === r} onPress={() => setRadiusKm(r)} />
           ))}
-        </ScrollView>
+        </ChipRow>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+      <ChipRow wide={wide}>
         <Chip label="Tout" selected={cats.length === 0} onPress={() => setCats([])} />
         {CATEGORIES.map((c) => (
           <Chip key={c.id} label={c.name} dot={c.ink} selected={cats.includes(c.id)} onPress={() => setCats(toggle(cats, c.id))} />
         ))}
-      </ScrollView>
+      </ChipRow>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+      <ChipRow wide={wide}>
         {CONDITIONS.map((c) => (
           <Chip key={c.id} label={c.label} selected={conds.includes(c.id)} onPress={() => setConds(toggle(conds, c.id))} />
         ))}
         <Chip label="Particuliers" selected={proOnly === false} onPress={() => setProOnly(proOnly === false ? null : false)} />
         <Chip label="Professionnels" selected={proOnly === true} onPress={() => setProOnly(proOnly === true ? null : true)} />
-      </ScrollView>
+      </ChipRow>
 
       <View style={[styles.row, { justifyContent: 'space-between' }]}>
         <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flexShrink: 0 }}>
           {results ? `${results.length} annonce${results.length > 1 ? 's' : ''}` : ' '}
         </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.xs }}>
+        <ChipRow wide={wide} gap={space.xs}>
           {SORTS.map((s) => (
             <Pressable key={s.id} onPress={() => setSort(s.id)} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
               <Text style={{ color: sort === s.id ? t.accent : t.muted, fontWeight: sort === s.id ? '700' : '500', fontSize: 13 }}>{s.label}</Text>
             </Pressable>
           ))}
-        </ScrollView>
+        </ChipRow>
       </View>
       {error ? <P style={{ color: t.danger }}>{error}</P> : null}
     </View>
@@ -164,7 +177,7 @@ export default function ExploreScreen() {
         numColumns={columns}
         keyExtractor={(l) => l.id}
         ListHeaderComponent={header}
-        contentContainerStyle={{ padding: space.lg, gap: space.md, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' }}
+        contentContainerStyle={{ padding: wide ? space.xxl : space.lg, gap: space.md, width: '100%' }}
         columnWrapperStyle={{ gap: space.md }}
         refreshing={false}
         onRefresh={load}
