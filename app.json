@@ -30,7 +30,6 @@
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/favicon.png",
       "name": "Bâtiplace"
     },
     "plugins": [
