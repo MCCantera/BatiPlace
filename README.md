@@ -30,12 +30,18 @@ Vérifications : `npm run typecheck` et `npm run build:web`.
 ## Base de données
 
 ```bash
-supabase link --project-ref <ref>
+supabase link --project-ref gvzroqbummpzgvzubazq
 supabase db push
 supabase functions deploy delete-account
 supabase functions deploy revenuecat-webhook --no-verify-jwt
 supabase secrets set REVENUECAT_WEBHOOK_SECRET=<valeur>
 ```
+
+## Site Web (Vercel)
+
+Importer le dépôt dans Vercel : la configuration est dans `vercel.json` (build `expo export`, sortie `dist`). Ajouter `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_KEY` dans les variables d'environnement si `.env` n'est pas utilisé. Chaque push sur `main` redéploie le site.
+
+Dans Supabase > Authentication > URL Configuration, mettre l'adresse du site comme Site URL pour que les liens de confirmation de courriel pointent au bon endroit.
 
 ## Publication iOS
 
