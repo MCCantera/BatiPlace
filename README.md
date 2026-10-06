@@ -8,12 +8,12 @@ Une seule base de code pour le site Web et l'application iPhone (Android ensuite
 
 - **Expo (React Native) + Expo Router** : application iOS, Android et site Web (`src/app`).
 - **Supabase** : comptes, base Postgres + PostGIS (recherche par distance), photos (Storage), messagerie en temps réel. Schéma : `supabase/migrations`.
-- **RevenueCat** : abonnement Bâtiplace Illimité (14,99 $/mois) via l'App Store et Google Play. Le webhook `supabase/functions/revenuecat-webhook` tient la table `subscriptions` à jour, ce qui débloque aussi le site Web pour le même compte.
+- **RevenueCat** : abonnement Bâtiplace Illimité (9,99 $/mois) via l'App Store et Google Play. Le webhook `supabase/functions/revenuecat-webhook` tient la table `subscriptions` à jour, ce qui débloque aussi le site Web pour le même compte.
 
 ## Règles d'affaires
 
 - Forfait gratuit : 5 annonces actives (appliqué par la base, trigger `enforce_listing_limit`).
-- Bâtiplace Illimité : annonces illimitées, 14,99 $/mois, acheté dans l'application.
+- Bâtiplace Illimité : annonces illimitées, 9,99 $/mois, acheté dans l'application.
 - Aucune commission sur les ventes.
 
 ## Démarrer

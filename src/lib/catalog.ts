@@ -136,4 +136,4 @@ export function timeAgo(iso: string) {
 }
 
 export const FREE_LISTING_LIMIT = 5;
-export const SUBSCRIPTION_PRICE = '14,99 $';
+export const SUBSCRIPTION_PRICE = '9,99 $';
