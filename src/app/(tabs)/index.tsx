@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { CityField } from '@/components/city-field';
 import { ListingCard } from '@/components/listing-card';
 import { Button, Chip, Empty, Icon, Loading, P } from '@/components/ui';
 import { CATEGORIES, CITY_NAMES, CONDITIONS } from '@/lib/catalog';
@@ -212,7 +213,17 @@ export default function ExploreScreen() {
                 if (ok) setPicker(false);
               }}
             />
-            <ScrollView style={{ maxHeight: 360 }}>
+            <CityField
+              pickOnly
+              value=""
+              onChange={(c) => {
+                if (!c) return;
+                setCity(c);
+                setPicker(false);
+              }}
+            />
+            <Text style={{ color: t.muted, fontSize: 13, fontWeight: '600' }}>Grandes villes</Text>
+            <ScrollView style={{ maxHeight: 300 }}>
               {CITY_NAMES.map((c) => (
                 <Pressable
                   key={c}

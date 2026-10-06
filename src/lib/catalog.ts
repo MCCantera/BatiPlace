@@ -1,4 +1,5 @@
 import type { ListingCondition, SellerType } from './database.types';
+import { QUEBEC_PLACES } from './quebec-places';
 
 /** Mirrors the `categories` table so the UI renders before the network answers. */
 export const CATEGORIES = [
@@ -39,8 +40,8 @@ export const sellerTypeLabel = (t: SellerType) => SELLER_TYPES.find((x) => x.id 
 
 export const PRICE_UNITS = ['', 'le lot', '/ unité', '/ boîte', '/ pi²', '/ panneau', '/ morceau'];
 
-/** Main Québec cities, used when the person does not share their location. */
-export const CITIES: Record<string, { lat: number; lng: number }> = {
+/** Main Québec cities, suggested first and used for the location picker. */
+const MAIN_CITIES: Record<string, { lat: number; lng: number }> = {
   Montréal: { lat: 45.5017, lng: -73.5673 },
   Laval: { lat: 45.5699, lng: -73.692 },
   Longueuil: { lat: 45.5312, lng: -73.5185 },
@@ -61,7 +62,50 @@ export const CITIES: Record<string, { lat: number; lng: number }> = {
   'Rouyn-Noranda': { lat: 48.2366, lng: -79.0231 },
 };
 
-export const CITY_NAMES = Object.keys(CITIES);
+export const CITY_NAMES = Object.keys(MAIN_CITIES);
+
+/** Every Québec municipality we know, by name. */
+export const CITIES: Record<string, { lat: number; lng: number }> = {
+  ...Object.fromEntries(QUEBEC_PLACES.map(([name, lat, lng]) => [name, { lat, lng }])),
+  ...MAIN_CITIES,
+};
+
+const fold = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    // « St-Jérôme », « Ste-Julie » : abréviations courantes au Québec.
+    .replace(/\bste\b/g, 'sainte')
+    .replace(/\bst\b/g, 'saint');
+
+const CITY_INDEX = Object.keys(CITIES).map((name) => ({ name, key: fold(name), main: name in MAIN_CITIES }));
+
+/** Exact city name for what was typed, ignoring accents, case and dashes. */
+export function findCity(text: string) {
+  const k = fold(text);
+  return k ? CITY_INDEX.find((c) => c.key === k)?.name : undefined;
+}
+
+/** Cities matching what was typed: names starting with it first, then any word starting with it. */
+export function searchCities(text: string, limit = 6) {
+  const k = fold(text);
+  if (!k) return [];
+  const parts = k.split(' ');
+  const score = (c: (typeof CITY_INDEX)[number]) => {
+    if (c.key.startsWith(k)) return 0;
+    const words = c.key.split(' ');
+    if (parts.every((p) => words.some((w) => w.startsWith(p)))) return 1;
+    return c.key.includes(k) ? 2 : -1;
+  };
+  return CITY_INDEX.map((c) => ({ c, s: score(c) }))
+    .filter((x) => x.s >= 0)
+    .sort((x, y) => x.s - y.s || Number(y.c.main) - Number(x.c.main) || x.c.name.length - y.c.name.length || x.c.name.localeCompare(y.c.name, 'fr'))
+    .slice(0, limit)
+    .map((x) => x.c.name);
+}
 
 export function pointWkt(lat: number, lng: number) {
   return `SRID=4326;POINT(${lng} ${lat})`;

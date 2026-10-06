@@ -4,7 +4,8 @@ import { Text, View } from 'react-native';
 
 import { Button, Card, Chip, Field, H2, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
-import { CITY_NAMES, SELLER_TYPES } from '@/lib/catalog';
+import { CityField } from '@/components/city-field';
+import { SELLER_TYPES } from '@/lib/catalog';
 import type { SellerType } from '@/lib/database.types';
 import { friendlyError, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
@@ -75,14 +76,7 @@ export default function ProfileScreen() {
             hint="Nous vérifions la licence auprès de la Régie du bâtiment avant d’afficher le badge."
           />
         ) : null}
-        <View style={{ gap: space.sm }}>
-          <Text style={{ color: t.text, fontWeight: '600' }}>Ville</Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-            {CITY_NAMES.map((c) => (
-              <Chip key={c} label={c} selected={city === c} onPress={() => setCity(c)} />
-            ))}
-          </View>
-        </View>
+        <CityField label="Ville" value={city} onChange={setCity} />
         {error ? <Notice tone="danger">{error}</Notice> : null}
         {message ? <Notice tone="ok" icon="checkmark-circle-outline">{message}</Notice> : null}
         <Button label="Enregistrer" loading={busy} onPress={save} />

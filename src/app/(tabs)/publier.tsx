@@ -4,10 +4,11 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { CityField } from '@/components/city-field';
 import { RequireAuth } from '@/components/require-auth';
 import { Button, Card, Chip, Field, H1, H2, Icon, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
-import { CATEGORIES, CITIES, CITY_NAMES, CONDITIONS, FREE_LISTING_LIMIT, PRICE_UNITS, SUBSCRIPTION_PRICE, pointWkt } from '@/lib/catalog';
+import { CATEGORIES, CITIES, CONDITIONS, FREE_LISTING_LIMIT, PRICE_UNITS, SUBSCRIPTION_PRICE, pointWkt } from '@/lib/catalog';
 import type { ListingCondition } from '@/lib/database.types';
 import { useOrigin } from '@/lib/location';
 import { PHOTO_BUCKET, friendlyError, supabase } from '@/lib/supabase';
@@ -35,7 +36,7 @@ function PublishForm() {
   const [unit, setUnit] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [spec, setSpec] = useState('');
-  const [city, setCity] = useState(profile?.city && CITIES[profile.city] ? profile.city : origin.fromDevice ? 'Montréal' : origin.label);
+  const [city, setCity] = useState(profile?.city && CITIES[profile.city] ? profile.city : CITIES[origin.label] ? origin.label : '');
   const [description, setDescription] = useState('');
   const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [busy, setBusy] = useState(false);
@@ -70,8 +71,8 @@ function PublishForm() {
     const cents = Math.round(parseFloat(price.replace(',', '.').replace(/\s/g, '')) * 100);
     if (title.trim().length < 3) return setError('Donnez un titre d’au moins 3 caractères.');
     if (!Number.isFinite(cents) || cents < 0) return setError('Indiquez un prix valide, par exemple 180 ou 3,50.');
-    const coords = city === 'Ma position' && origin.fromDevice ? origin : CITIES[city];
-    if (!coords) return setError('Choisissez une ville.');
+    const coords = CITIES[city];
+    if (!coords) return setError('Choisissez une ville du Québec dans la liste.');
 
     setBusy(true);
     const { data: listing, error: insertError } = await supabase
@@ -199,14 +200,7 @@ function PublishForm() {
 
           <Field label="Format ou dimensions" value={spec} onChangeText={setSpec} maxLength={80} placeholder="Ex. 4′ × 8′ × ½″" />
 
-          <View style={{ gap: space.sm }}>
-            <Text style={[styles.label, { color: t.text }]}>Ville</Text>
-            <View style={styles.wrap}>
-              {CITY_NAMES.map((c) => (
-                <Chip key={c} label={c} selected={city === c} onPress={() => setCity(c)} />
-              ))}
-            </View>
-          </View>
+          <CityField label="Ville" value={city} onChange={setCity} />
 
           <Field
             label="Description"

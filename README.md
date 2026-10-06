@@ -46,3 +46,7 @@ Dans Supabase > Authentication > URL Configuration, mettre l'adresse du site com
 ## Publication iOS
 
 Avec EAS : `npx eas-cli@latest build --platform ios` puis `npx eas-cli@latest submit --platform ios`. Nécessite un compte Apple Developer et l'abonnement configuré dans App Store Connect (produit mensuel lié à l'entitlement `illimite` dans RevenueCat).
+
+## Données
+
+Liste des villes du Québec (`src/lib/quebec-places.ts`) : GeoNames (CC BY 4.0, https://www.geonames.org), via le paquet npm `cities.json`.
