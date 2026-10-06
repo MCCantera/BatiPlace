@@ -31,7 +31,7 @@ export function photoUrl(path: string | null | undefined) {
 export function friendlyError(error: { message?: string; hint?: string } | null | undefined) {
   if (!error) return '';
   if (error.message?.includes('LIMITE_GRATUITE')) {
-    return 'Le forfait gratuit permet 2 annonces actives. Passez à Bâtiplace Illimité pour publier sans limite.';
+    return 'Le forfait gratuit permet 5 annonces actives. Passez à Bâtiplace Illimité pour publier sans limite.';
   }
   if (error.message?.includes('Invalid login credentials')) return 'Courriel ou mot de passe incorrect.';
   if (error.message?.includes('User already registered')) return 'Un compte existe déjà avec ce courriel.';

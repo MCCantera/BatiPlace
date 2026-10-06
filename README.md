@@ -12,7 +12,7 @@ Une seule base de code pour le site Web et l'application iPhone (Android ensuite
 
 ## Règles d'affaires
 
-- Forfait gratuit : 2 annonces actives (appliqué par la base, trigger `enforce_listing_limit`).
+- Forfait gratuit : 5 annonces actives (appliqué par la base, trigger `enforce_listing_limit`).
 - Bâtiplace Illimité : annonces illimitées, 14,99 $/mois, acheté dans l'application.
 - Aucune commission sur les ventes.
 

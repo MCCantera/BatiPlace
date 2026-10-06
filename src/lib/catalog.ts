@@ -91,5 +91,5 @@ export function timeAgo(iso: string) {
   return new Date(iso).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' });
 }
 
-export const FREE_LISTING_LIMIT = 2;
+export const FREE_LISTING_LIMIT = 5;
 export const SUBSCRIPTION_PRICE = '14,99 $';
