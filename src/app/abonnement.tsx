@@ -13,6 +13,7 @@ const PERKS = [
   'Valable dans l’application et sur le site Web',
   'Badge Pro et licence RBQ affichée',
   'Statistiques de vues et de messages',
+  'Rabais exclusifs chez nos partenaires',
   'Toujours 0 % de commission sur vos ventes',
 ];
 

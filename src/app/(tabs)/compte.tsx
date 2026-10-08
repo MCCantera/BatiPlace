@@ -80,6 +80,7 @@ function Account() {
             : `${active} / ${FREE_LISTING_LIMIT} annonces actives. Passez à Illimité pour ${SUBSCRIPTION_PRICE} par mois.`}
         </P>
         <Button kind={subscribed ? 'secondary' : 'primary'} label={subscribed ? 'Gérer l’abonnement' : 'Voir l’abonnement'} onPress={() => router.push('/abonnement')} />
+        <Button kind="secondary" icon="pricetags-outline" label="Rabais partenaires" onPress={() => router.push('/partenaires')} />
       </Card>
 
       <H2>Mes annonces</H2>

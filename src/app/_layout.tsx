@@ -34,6 +34,7 @@ function Navigator() {
       <Stack.Screen name="connexion" options={{ title: 'Connexion', presentation: 'modal' }} />
       <Stack.Screen name="abonnement" options={{ title: 'Bâtiplace Illimité', presentation: 'modal' }} />
       <Stack.Screen name="profil" options={{ title: 'Mon profil' }} />
+      <Stack.Screen name="partenaires" options={{ title: 'Partenaires' }} />
     </Stack>
   );
 }

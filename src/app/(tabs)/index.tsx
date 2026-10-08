@@ -100,6 +100,14 @@ export default function ExploreScreen() {
           Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et
           professionnels, partout au Québec. Publication gratuite, zéro commission.
         </P>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push('/partenaires')}
+          style={({ pressed }) => [styles.partners, { backgroundColor: t.surface }, pressed && { opacity: 0.85 }]}>
+          <Icon name="pricetags-outline" size={18} color={t.accent} />
+          <Text style={{ color: t.text, fontWeight: '700', flexShrink: 1 }}>Rabais exclusifs chez nos partenaires</Text>
+          <Icon name="chevron-forward" size={16} color={t.muted} />
+        </Pressable>
       </View>
 
       <View style={[styles.search, { backgroundColor: t.surface, borderColor: t.line }]}>
@@ -248,6 +256,7 @@ const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   mark: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
   hero: { borderRadius: radius.lg, padding: space.lg, gap: space.sm },
+  partners: { flexDirection: 'row', alignItems: 'center', gap: space.sm, alignSelf: 'flex-start', borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, marginTop: space.xs },
   search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingLeft: space.lg, paddingRight: 5, paddingVertical: 5 },
   searchBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 9 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },

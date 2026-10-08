@@ -125,6 +125,22 @@ export type SearchResult = {
   photo_path: string | null;
 };
 
+/** Public columns of a partner merchant. promo_code is only given to subscribers, through partner_promo_code(). */
+export type Partner = {
+  id: string;
+  name: string;
+  offer: string;
+  description: string;
+  category: string;
+  city: string;
+  address: string;
+  website: string;
+  logo_url: string;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -137,6 +153,7 @@ export type Database = {
       conversations: Table<Conversation, { listing_id: string; seller_id: string; buyer_id?: string }>;
       messages: Table<Message, { conversation_id: string; body: string; sender_id?: string }, { read_at?: string | null }>;
       reviews: Table<Review, { seller_id: string; rating: number; body?: string; author_id?: string }>;
+      partners: Table<Partner>;
     };
     Views: {
       seller_ratings: {
@@ -162,6 +179,7 @@ export type Database = {
       };
       increment_listing_view: { Args: { listing: string }; Returns: undefined };
       has_active_subscription: { Args: { uid: string }; Returns: boolean };
+      partner_promo_code: { Args: { partner: string }; Returns: string | null };
     };
     Enums: {
       seller_type: SellerType;

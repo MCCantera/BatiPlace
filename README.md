@@ -50,3 +50,7 @@ Avec EAS : `npx eas-cli@latest build --platform ios` puis `npx eas-cli@latest su
 ## Données
 
 Liste des villes du Québec (`src/lib/quebec-places.ts`) : GeoNames (CC BY 4.0, https://www.geonames.org), via le paquet npm `cities.json`.
+
+## Partenaires
+
+Page `/partenaires` : rabais exclusifs pour les abonnés Bâtiplace Illimité et LOKA. Pour ajouter un marchand : Supabase, Table Editor, table `partners`, Insert row. Champs obligatoires : `name`, `offer` (ex. « 15 % sur la quincaillerie »). Facultatifs : `description`, `category`, `city`, `address`, `website`, `logo_url`, `promo_code` (montré seulement aux abonnés Bâtiplace connectés), `sort_order` (ordre d'affichage), `active` (décocher pour masquer).
