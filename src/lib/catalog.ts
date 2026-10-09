@@ -139,4 +139,4 @@ export const FREE_LISTING_LIMIT = 5;
 export const SUBSCRIPTION_PRICE = '9,99 $';
 
 /** Courriel de contact public (confidentialité, soutien). À remplir par mc. */
-export const CONTACT_EMAIL = '';
+export const CONTACT_EMAIL = 'support@lokalogement.ca';
