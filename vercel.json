@@ -1,5 +1,9 @@
 {
   "buildCommand": "npx expo export --platform web",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/annonce/:id", "destination": "/api/annonce?id=:id" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }

@@ -7,12 +7,14 @@ import { RequireAuth } from '@/components/require-auth';
 import { Empty, H1, Loading, P, Screen } from '@/components/ui';
 import type { SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { useSeo } from '@/lib/seo';
 import { supabase } from '@/lib/supabase';
 import { space } from '@/lib/theme';
 
 type FavListing = Pick<SearchResult, 'id' | 'title' | 'price_cents' | 'price_unit' | 'city' | 'condition' | 'category_id' | 'spec' | 'photo_path'>;
 
 export default function FavoritesScreen() {
+  useSeo({ title: 'Favoris', noindex: true });
   return (
     <RequireAuth title="Favoris" reason="Sauvegardez des annonces pour les retrouver ici, sur le Web comme dans l’application.">
       <FavoritesList />

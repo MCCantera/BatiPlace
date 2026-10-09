@@ -6,6 +6,7 @@ import { Linking, Text, View, useWindowDimensions } from 'react-native';
 import { Avatar, Button, Card, Empty, H1, Icon, Loading, Notice, P, Screen, Tag } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import type { Partner } from '@/lib/database.types';
+import { useSeo } from '@/lib/seo';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
@@ -13,6 +14,7 @@ import { radius, space, useTheme } from '@/lib/theme';
 const PARTNER_COLUMNS = 'id, name, offer, description, category, city, address, website, logo_url, active, sort_order, created_at';
 
 export default function PartnersScreen() {
+  useSeo({ title: 'Partenaires : rabais exclusifs pour les abonnés', description: 'Rabais exclusifs chez des quincailleries, fournisseurs et commerces du Québec pour les abonnés Bâtiplace et LOKA.', path: '/partenaires' });
   const t = useTheme();
   const { width } = useWindowDimensions();
   const [partners, setPartners] = useState<Partner[] | null>(null);

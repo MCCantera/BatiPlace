@@ -1,11 +1,44 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr-CA">
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Bâtiplace</title>
-    <meta name="description" content="Le marketplace de la construction au Québec. Achetez et vendez matériaux, outils et équipements neufs ou usagés. Publication gratuite, zéro commission." />
+    <title>Bâtiplace · Le marketplace de la construction au Québec</title>
+    <meta name="description" content="Le marketplace de la construction au Québec. Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels. Publication gratuite, zéro commission." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bâtiplace" />
+    <meta property="og:locale" content="fr_CA" />
+    <meta property="og:title" content="Bâtiplace · Le marketplace de la construction au Québec" />
+    <meta property="og:description" content="Le marketplace de la construction au Québec. Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels. Publication gratuite, zéro commission." />
+    <meta property="og:url" content="https://www.batiplace.ca/" />
+    <meta property="og:image" content="https://www.batiplace.ca/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.batiplace.ca/#organisation",
+            "name": "Bâtiplace",
+            "url": "https://www.batiplace.ca/",
+            "logo": "https://www.batiplace.ca/apple-touch-icon.png",
+            "areaServed": { "@type": "State", "name": "Québec" }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.batiplace.ca/#site",
+            "name": "Bâtiplace",
+            "url": "https://www.batiplace.ca/",
+            "inLanguage": "fr-CA",
+            "publisher": { "@id": "https://www.batiplace.ca/#organisation" }
+          }
+        ]
+      }
+    </script>
     <meta name="theme-color" content="#FF6A3D" />
     <link rel="icon" type="image/png" href="/favicon-v2.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -27,7 +60,12 @@
   </head>
 
   <body>
-    <noscript>Activez JavaScript pour utiliser Bâtiplace.</noscript>
+    <noscript>
+      <h1>Bâtiplace, le marketplace de la construction au Québec</h1>
+      <p>Achetez et vendez matériaux de construction, surplus de chantier, outils, équipements et machinerie, neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.</p>
+      <p><a href="/publier">Publier une annonce gratuite</a> · <a href="/partenaires">Partenaires</a> · <a href="/abonnement">Bâtiplace Illimité</a></p>
+      <p>Activez JavaScript pour utiliser Bâtiplace.</p>
+    </noscript>
     <div id="root"></div>
   </body>
 </html>

@@ -10,6 +10,7 @@ import { CATEGORIES, CITY_NAMES, CONDITIONS } from '@/lib/catalog';
 import type { ListingCondition, SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
 import { useOrigin } from '@/lib/location';
+import { useSeo } from '@/lib/seo';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
@@ -33,6 +34,7 @@ function ChipRow({ wide, gap = space.sm, children }: { wide: boolean; gap?: numb
 }
 
 export default function ExploreScreen() {
+  useSeo({ path: '/' });
   const t = useTheme();
   const { width } = useWindowDimensions();
   const { origin, radiusKm, setRadiusKm, setCity, useDeviceLocation } = useOrigin();

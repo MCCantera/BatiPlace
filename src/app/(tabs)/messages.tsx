@@ -7,12 +7,14 @@ import { Avatar, Empty, H1, Loading, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { timeAgo } from '@/lib/catalog';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
+import { useSeo } from '@/lib/seo';
 import { supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
 type Summary = { last: string; mine: boolean; unread: number };
 
 export default function MessagesScreen() {
+  useSeo({ title: 'Messages', noindex: true });
   return (
     <RequireAuth title="Messages" reason="Écrivez aux vendeurs et répondez aux acheteurs, sans partager votre numéro.">
       <Inbox />

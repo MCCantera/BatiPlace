@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { category, conditionLabel, money, sellerTypeLabel, timeAgo } from '@/lib/catalog';
 import type { Listing, Profile } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { listingSeo, useSeo } from '@/lib/seo';
 import { friendlyError, photoUrl, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
@@ -44,6 +45,13 @@ export default function ListingScreen() {
         }
       });
   }, [id]);
+
+  const firstPhoto = item ? [...item.listing_photos].sort((a, b) => a.position - b.position)[0] : undefined;
+  useSeo(
+    item
+      ? listingSeo(item, category(item.category_id).name, photoUrl(firstPhoto?.path))
+      : { title: 'Annonce introuvable', noindex: true, pending: item === undefined },
+  );
 
   if (item === undefined) return <Loading />;
   if (item === null)

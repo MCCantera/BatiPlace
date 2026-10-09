@@ -7,10 +7,12 @@ import { useAuth } from '@/lib/auth';
 import { CityField } from '@/components/city-field';
 import { SELLER_TYPES } from '@/lib/catalog';
 import type { SellerType } from '@/lib/database.types';
+import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
 
 export default function ProfileScreen() {
+  useSeo({ title: 'Mon profil', noindex: true });
   const t = useTheme();
   const { userId, profile, refresh, signOut } = useAuth();
   const [name, setName] = useState('');

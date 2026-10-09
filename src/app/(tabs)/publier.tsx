@@ -11,12 +11,14 @@ import { useAuth } from '@/lib/auth';
 import { CATEGORIES, CITIES, CONDITIONS, FREE_LISTING_LIMIT, PRICE_UNITS, SUBSCRIPTION_PRICE, pointWkt } from '@/lib/catalog';
 import type { ListingCondition } from '@/lib/database.types';
 import { useOrigin } from '@/lib/location';
+import { useSeo } from '@/lib/seo';
 import { PHOTO_BUCKET, friendlyError, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
 const MAX_PHOTOS = 8;
 
 export default function PublishScreen() {
+  useSeo({ title: 'Publier une annonce gratuite', description: 'Vendez vos matériaux de construction, surplus de chantier, outils et équipements partout au Québec. Publication gratuite, zéro commission.', path: '/publier' });
   return (
     <RequireAuth title="Publier une annonce" reason="La publication est gratuite. Il faut seulement un compte pour que les acheteurs puissent vous écrire.">
       <PublishForm />

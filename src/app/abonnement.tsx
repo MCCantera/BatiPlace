@@ -6,6 +6,7 @@ import { Button, Card, H1, Icon, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { FREE_LISTING_LIMIT, SUBSCRIPTION_PRICE } from '@/lib/catalog';
 import { buySubscription, purchasesAvailable, restorePurchases, storeName } from '@/lib/purchases';
+import { useSeo } from '@/lib/seo';
 import { space, useTheme } from '@/lib/theme';
 
 const PERKS = [
@@ -18,6 +19,7 @@ const PERKS = [
 ];
 
 export default function SubscriptionScreen() {
+  useSeo({ title: 'Bâtiplace Illimité : annonces illimitées à 9,99 $/mois', description: 'Publiez autant d’annonces que vous voulez sur Bâtiplace pour 9,99 $ par mois. Les 5 premières annonces actives restent gratuites, sans commission.', path: '/abonnement' });
   const t = useTheme();
   const { userId, subscribed, refresh } = useAuth();
   const [busy, setBusy] = useState(false);

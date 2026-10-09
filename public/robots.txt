@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /conversation/
+Disallow: /compte
+Disallow: /messages
+Disallow: /favoris
+Disallow: /profil
+Disallow: /connexion
+
+Sitemap: https://www.batiplace.ca/sitemap.xml

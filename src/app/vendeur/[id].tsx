@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { sellerTypeLabel } from '@/lib/catalog';
 import type { Listing, Profile, Review } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
 
@@ -51,6 +52,16 @@ export default function SellerScreen() {
       .then(({ data }) => setListings((data ?? []) as unknown as SellerListing[]));
     loadReviews();
   }, [id, loadReviews]);
+
+  useSeo(
+    profile
+      ? {
+          title: `${profile.display_name} : annonces à vendre${profile.city ? ` à ${profile.city}` : ''}`,
+          description: `Matériaux, outils et équipements vendus par ${profile.display_name} (${sellerTypeLabel(profile.seller_type)}) sur Bâtiplace, le marketplace de la construction au Québec.`,
+          path: `/vendeur/${profile.id}`,
+        }
+      : { title: 'Vendeur introuvable', noindex: true, pending: profile === undefined },
+  );
 
   if (profile === undefined) return <Loading />;
   if (profile === null) return <Screen edges={[]}><Empty title="Ce profil n’existe plus" /></Screen>;

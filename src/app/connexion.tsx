@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { Button, Card, Chip, Field, H1, Notice, P, Screen } from '@/components/ui';
+import { useSeo } from '@/lib/seo';
 import { friendlyError, isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { space } from '@/lib/theme';
 
 export default function SignInScreen() {
+  useSeo({ title: 'Connexion', noindex: true });
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

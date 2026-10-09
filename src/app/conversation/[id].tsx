@@ -7,12 +7,14 @@ import { Chip, Icon, Loading } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
 import type { Message } from '@/lib/database.types';
+import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
 import { MAX_WIDTH, radius, space, useTheme } from '@/lib/theme';
 
 const QUICK_REPLIES = ['Est-ce encore disponible ?', 'Quel est votre meilleur prix ?', 'Livrez-vous ?', 'Je peux passer demain.'];
 
 export default function ConversationScreen() {
+  useSeo({ title: 'Conversation', noindex: true });
   const { id, draft } = useLocalSearchParams<{ id: string; draft?: string }>();
   const t = useTheme();
   const { userId } = useAuth();

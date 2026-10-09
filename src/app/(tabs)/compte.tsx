@@ -7,6 +7,7 @@ import { Avatar, Button, Card, Empty, H1, H2, ListingImage, Loading, P, Screen, 
 import { useAuth } from '@/lib/auth';
 import { FREE_LISTING_LIMIT, SUBSCRIPTION_PRICE, money, sellerTypeLabel, timeAgo } from '@/lib/catalog';
 import type { Listing, ListingStatus } from '@/lib/database.types';
+import { useSeo } from '@/lib/seo';
 import { friendlyError, photoUrl, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
@@ -17,6 +18,7 @@ type MyListing = Pick<Listing, 'id' | 'title' | 'price_cents' | 'price_unit' | '
 const STATUS_LABEL: Record<ListingStatus, string> = { active: 'Active', vendue: 'Vendue', retiree: 'Retirée' };
 
 export default function AccountScreen() {
+  useSeo({ title: 'Mon compte', noindex: true });
   return (
     <RequireAuth title="Mon compte" reason="Gérez vos annonces, votre profil vendeur et votre abonnement.">
       <Account />
