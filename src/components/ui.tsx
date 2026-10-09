@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { category } from '@/lib/catalog';
+import { useI18n } from '@/lib/i18n';
 import { MAX_WIDTH, radius, space, useTheme } from '@/lib/theme';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -263,9 +264,10 @@ export function Avatar({ name, size = 44, color, uri }: { name: string; size?: n
 
 export function Stars({ value, size = 14 }: { value: number; size?: number }) {
   const t = useTheme();
+  const { tr } = useI18n();
   const n = Math.round(value);
   return (
-    <View style={{ flexDirection: 'row', gap: 1 }} accessibilityLabel={`${value.toFixed(1)} sur 5`}>
+    <View style={{ flexDirection: 'row', gap: 1 }} accessibilityLabel={tr('{value} sur 5', { value: value.toFixed(1) })}>
       {[1, 2, 3, 4, 5].map((i) => (
         <Ionicons key={i} name={i <= n ? 'star' : 'star-outline'} size={size} color={i <= n ? t.accent : t.line} />
       ))}

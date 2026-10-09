@@ -5,6 +5,7 @@ import { Linking, Text, View, useWindowDimensions } from 'react-native';
 
 import { Avatar, Button, Card, Empty, H1, Icon, Loading, Notice, P, Screen, Tag } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n';
 import type { Partner } from '@/lib/database.types';
 import { useSeo } from '@/lib/seo';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
@@ -16,9 +17,10 @@ const PARTNER_COLUMNS = 'id, name, offer, description, category, city, address, 
 export default function PartnersScreen() {
   useSeo({ title: 'Partenaires : rabais exclusifs pour les abonnés', description: 'Rabais exclusifs chez des quincailleries, fournisseurs et commerces du Québec pour les abonnés Bâtiplace et LOKA.', path: '/partenaires' });
   const t = useTheme();
+  const { tr } = useI18n();
   const { width } = useWindowDimensions();
   const [partners, setPartners] = useState<Partner[] | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -29,7 +31,7 @@ export default function PartnersScreen() {
         .order('sort_order')
         .order('name')
         .then(({ data, error: err }) => {
-          setError(err ? 'Impossible de charger les partenaires. Vérifiez votre connexion.' : '');
+          setError(!!err);
           setPartners((data as Partner[] | null) ?? []);
         });
     }, []),
@@ -40,20 +42,18 @@ export default function PartnersScreen() {
   return (
     <Screen edges={[]}>
       <View style={{ gap: space.sm }}>
-        <H1>Partenaires</H1>
-        <P muted>
-          Des rabais exclusifs chez nos marchands partenaires, réservés aux abonnés Bâtiplace Illimité et LOKA.
-        </P>
+        <H1>{tr('Partenaires')}</H1>
+        <P muted>{tr('Des rabais exclusifs chez nos marchands partenaires, réservés aux abonnés Bâtiplace Illimité et LOKA.')}</P>
       </View>
 
-      {error ? <Notice tone="danger">{error}</Notice> : null}
+      {error ? <Notice tone="danger">{tr('Impossible de charger les partenaires. Vérifiez votre connexion.')}</Notice> : null}
 
       {partners === null ? (
         <Loading />
       ) : partners.length === 0 ? (
         <Empty
-          title="Nos premiers partenaires arrivent bientôt"
-          body="Nous discutons avec des quincailleries, centres de rénovation et fournisseurs du Québec. Leurs rabais exclusifs apparaîtront ici."
+          title={tr('Nos premiers partenaires arrivent bientôt')}
+          body={tr('Nous discutons avec des quincailleries, centres de rénovation et fournisseurs du Québec. Leurs rabais exclusifs apparaîtront ici.')}
         />
       ) : (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
@@ -66,11 +66,9 @@ export default function PartnersScreen() {
       )}
 
       <Card style={{ gap: space.sm, backgroundColor: t.surface2 }}>
-        <Text style={{ color: t.text, fontWeight: '700', fontSize: 15 }}>Comment profiter d’un rabais</Text>
-        <P muted>
-          Abonnés Bâtiplace Illimité : connectez-vous pour afficher le code du partenaire, ou présentez votre abonnement en magasin.
-        </P>
-        <P muted>Abonnés LOKA : présentez votre abonnement LOKA actif en magasin.</P>
+        <Text style={{ color: t.text, fontWeight: '700', fontSize: 15 }}>{tr('Comment profiter d’un rabais')}</Text>
+        <P muted>{tr('Abonnés Bâtiplace Illimité : connectez-vous pour afficher le code du partenaire, ou présentez votre abonnement en magasin.')}</P>
+        <P muted>{tr('Abonnés LOKA : présentez votre abonnement LOKA actif en magasin.')}</P>
       </Card>
     </Screen>
   );
@@ -78,6 +76,7 @@ export default function PartnersScreen() {
 
 function PartnerCard({ partner: p }: { partner: Partner }) {
   const t = useTheme();
+  const { tr } = useI18n();
   const { userId, subscribed } = useAuth();
   const [code, setCode] = useState<string | null>(null);
   const [loadingCode, setLoadingCode] = useState(false);
@@ -119,22 +118,22 @@ function PartnerCard({ partner: p }: { partner: Partner }) {
       <View style={{ gap: space.sm, marginTop: 'auto' }}>
         {subscribed ? (
           code === null ? (
-            <Button kind="brand" icon="pricetag-outline" label="Obtenir mon rabais" loading={loadingCode} onPress={showCode} />
+            <Button kind="brand" icon="pricetag-outline" label={tr('Obtenir mon rabais')} loading={loadingCode} onPress={showCode} />
           ) : code ? (
             <View style={{ borderWidth: 1, borderStyle: 'dashed', borderColor: t.accent, borderRadius: radius.md, padding: space.md, alignItems: 'center', gap: 4 }}>
-              <Text style={{ color: t.muted, fontSize: 13 }}>Votre code</Text>
+              <Text style={{ color: t.muted, fontSize: 13 }}>{tr('Votre code')}</Text>
               <Text selectable style={{ color: t.text, fontWeight: '800', fontSize: 22, letterSpacing: 1 }}>
                 {code}
               </Text>
             </View>
           ) : (
-            <Notice icon="storefront-outline">Présentez votre abonnement Bâtiplace Illimité en magasin pour obtenir le rabais.</Notice>
+            <Notice icon="storefront-outline">{tr('Présentez votre abonnement Bâtiplace Illimité en magasin pour obtenir le rabais.')}</Notice>
           )
         ) : (
           <Button
             kind="secondary"
             icon="lock-closed-outline"
-            label={userId ? 'Réservé aux abonnés' : 'Connectez-vous pour en profiter'}
+            label={userId ? tr('Réservé aux abonnés') : tr('Connectez-vous pour en profiter')}
             onPress={() => router.push(userId ? '/abonnement' : '/connexion')}
           />
         )}
@@ -142,7 +141,7 @@ function PartnerCard({ partner: p }: { partner: Partner }) {
           <Button kind="secondary" icon="call-outline" label={p.phone} onPress={() => Linking.openURL(`tel:${p.phone.replace(/[^\d+]/g, '')}`)} />
         ) : null}
         {p.email ? <Button kind="secondary" icon="mail-outline" label={p.email} onPress={() => Linking.openURL(`mailto:${p.email}`)} /> : null}
-        {website ? <Button kind="secondary" icon="open-outline" label="Site Web" onPress={() => Linking.openURL(website)} /> : null}
+        {website ? <Button kind="secondary" icon="open-outline" label={tr('Site Web')} onPress={() => Linking.openURL(website)} /> : null}
       </View>
     </Card>
   );

@@ -7,6 +7,7 @@ import { Chip, Icon, Loading } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
 import type { Message } from '@/lib/database.types';
+import { locale, useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
 import { MAX_WIDTH, radius, space, useTheme } from '@/lib/theme';
@@ -17,6 +18,7 @@ export default function ConversationScreen() {
   useSeo({ title: 'Conversation', noindex: true });
   const { id, draft } = useLocalSearchParams<{ id: string; draft?: string }>();
   const t = useTheme();
+  const { tr } = useI18n();
   const { userId } = useAuth();
   const [conv, setConv] = useState<ConversationRow | null>(null);
   const [messages, setMessages] = useState<Message[] | null>(null);
@@ -73,7 +75,7 @@ export default function ConversationScreen() {
 
   return (
     <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: t.bg }}>
-      <Stack.Screen options={{ title: other?.display_name || 'Conversation' }} />
+      <Stack.Screen options={{ title: other?.display_name || tr('Conversation') }} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
         <View style={styles.column}>
           {conv?.listing ? (
@@ -101,12 +103,12 @@ export default function ConversationScreen() {
                   <View style={[styles.bubble, mine ? { alignSelf: 'flex-end', backgroundColor: t.accent, borderBottomRightRadius: 6 } : { alignSelf: 'flex-start', backgroundColor: t.surface2 }]}>
                     <Text style={{ color: mine ? t.accentText : t.text, fontSize: 15 }}>{item.body}</Text>
                     <Text style={{ color: mine ? t.accentText : t.muted, fontSize: 11, opacity: 0.75, marginTop: 2 }}>
-                      {new Date(item.created_at).toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(item.created_at).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                   </View>
                 );
               }}
-              ListEmptyComponent={<Text style={{ color: t.muted, textAlign: 'center', marginTop: space.xl }}>Écrivez votre premier message.</Text>}
+              ListEmptyComponent={<Text style={{ color: t.muted, textAlign: 'center', marginTop: space.xl }}>{tr('Écrivez votre premier message.')}</Text>}
             />
           )}
 
@@ -117,27 +119,27 @@ export default function ConversationScreen() {
               keyExtractor={(q) => q}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ gap: space.sm }}
-              renderItem={({ item }) => <Chip label={item} onPress={() => setText(item)} />}
+              renderItem={({ item }) => <Chip label={tr(item)} onPress={() => setText(tr(item))} />}
             />
             {error ? <Text style={{ color: t.danger }}>{error}</Text> : null}
             <View style={[styles.compose, { borderColor: t.line, backgroundColor: t.surface }]}>
               <TextInput
                 value={text}
                 onChangeText={setText}
-                placeholder="Écrire un message…"
+                placeholder={tr('Écrire un message…')}
                 placeholderTextColor={t.muted}
                 style={{ flex: 1, color: t.text, fontSize: 16, paddingVertical: 10 }}
                 multiline
                 maxLength={2000}
                 onSubmitEditing={send}
-                accessibilityLabel="Message"
+                accessibilityLabel={tr('Message')}
               />
-              <Pressable onPress={send} accessibilityLabel="Envoyer" style={[styles.send, { backgroundColor: t.accent }]}>
+              <Pressable onPress={send} accessibilityLabel={tr('Envoyer')} style={[styles.send, { backgroundColor: t.accent }]}>
                 <Icon name="send" size={16} color={t.accentText} />
               </Pressable>
             </View>
             <Text style={{ color: t.muted, fontSize: 12, textAlign: 'center', marginBottom: space.sm }}>
-              Ne payez jamais avant d’avoir vu l’article.
+              {tr('Ne payez jamais avant d’avoir vu l’article.')}
             </Text>
           </View>
         </View>

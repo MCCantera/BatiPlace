@@ -1,4 +1,5 @@
 import type { ListingCondition, SellerType } from './database.types';
+import { locale, tr } from './i18n';
 import { QUEBEC_PLACES } from './quebec-places';
 
 /** Mirrors the `categories` table so the UI renders before the network answers. */
@@ -27,7 +28,7 @@ export const CONDITIONS: { id: ListingCondition; label: string }[] = [
   { id: 'surplus', label: 'Surplus de chantier' },
 ];
 
-export const conditionLabel = (c: ListingCondition) => CONDITIONS.find((x) => x.id === c)?.label ?? c;
+export const conditionLabel = (c: ListingCondition) => tr(CONDITIONS.find((x) => x.id === c)?.label ?? c);
 
 export const SELLER_TYPES: { id: SellerType; label: string }[] = [
   { id: 'particulier', label: 'Particulier' },
@@ -36,7 +37,7 @@ export const SELLER_TYPES: { id: SellerType; label: string }[] = [
   { id: 'entreprise', label: 'Entreprise' },
 ];
 
-export const sellerTypeLabel = (t: SellerType) => SELLER_TYPES.find((x) => x.id === t)?.label ?? t;
+export const sellerTypeLabel = (t: SellerType) => tr(SELLER_TYPES.find((x) => x.id === t)?.label ?? t);
 
 export const PRICE_UNITS = ['', 'le lot', '/ unité', '/ boîte', '/ pi²', '/ panneau', '/ morceau'];
 
@@ -112,7 +113,7 @@ export function pointWkt(lat: number, lng: number) {
 }
 
 const moneyFmt = (cents: number) =>
-  new Intl.NumberFormat('fr-CA', {
+  new Intl.NumberFormat(locale(), {
     style: 'currency',
     currency: 'CAD',
     minimumFractionDigits: cents % 100 ? 2 : 0,
@@ -129,14 +130,16 @@ export function distanceLabel(km: number) {
 
 export function timeAgo(iso: string) {
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-  if (days < 1) return 'aujourd’hui';
-  if (days === 1) return 'hier';
-  if (days < 30) return `il y a ${days} j`;
-  return new Date(iso).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' });
+  if (days < 1) return tr('aujourd’hui');
+  if (days === 1) return tr('hier');
+  if (days < 30) return tr('il y a {n} j', { n: days });
+  return new Date(iso).toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
 }
 
 export const FREE_LISTING_LIMIT = 5;
+/** Display price; use subscriptionPrice() so it follows the language. */
 export const SUBSCRIPTION_PRICE = '9,99 $';
+export const subscriptionPrice = () => (locale() === 'en-CA' ? '$9.99' : SUBSCRIPTION_PRICE);
 
 /** Courriel de contact public (confidentialité, soutien). À remplir par mc. */
 export const CONTACT_EMAIL = 'support@lokalogement.ca';

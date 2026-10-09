@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { CityField } from '@/components/city-field';
 import { SELLER_TYPES } from '@/lib/catalog';
 import type { SellerType } from '@/lib/database.types';
+import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { PHOTO_BUCKET, friendlyError, photoUrl, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
@@ -15,6 +16,7 @@ import { space, useTheme } from '@/lib/theme';
 export default function ProfileScreen() {
   useSeo({ title: 'Mon profil', noindex: true });
   const t = useTheme();
+  const { tr } = useI18n();
   const { userId, profile, refresh, signOut } = useAuth();
   const [name, setName] = useState('');
   const [type, setType] = useState<SellerType>('particulier');
@@ -47,7 +49,7 @@ export default function ProfileScreen() {
     setBusy(false);
     if (err) return setError(friendlyError(err));
     await refresh();
-    setMessage('Profil enregistré.');
+    setMessage(tr('Profil enregistré.'));
   }
 
   /** Uploads the photo right away (in the user's own storage folder) and saves its URL on the profile. */
@@ -63,7 +65,7 @@ export default function ProfileScreen() {
       const { error: upErr } = await supabase.storage.from(PHOTO_BUCKET).upload(path, body, { contentType });
       if (upErr) {
         setPhotoBusy(false);
-        return setError('La photo n’a pas pu être envoyée. Essayez une image JPEG ou PNG de moins de 8 Mo.');
+        return setError(tr('La photo n’a pas pu être envoyée. Essayez une image JPEG ou PNG de moins de 8 Mo.'));
       }
       avatarUrl = photoUrl(path);
     }
@@ -78,7 +80,7 @@ export default function ProfileScreen() {
     if (old?.includes(marker)) await supabase.storage.from(PHOTO_BUCKET).remove([old.slice(old.indexOf(marker) + marker.length)]);
     await refresh();
     setPhotoBusy(false);
-    setMessage(asset ? 'Photo de profil enregistrée.' : 'Photo de profil retirée.');
+    setMessage(asset ? tr('Photo de profil enregistrée.') : tr('Photo de profil retirée.'));
   }
 
   async function pickPhoto() {
@@ -90,7 +92,7 @@ export default function ProfileScreen() {
     setBusy(true);
     const { error: err } = await supabase.functions.invoke('delete-account', { method: 'POST' });
     setBusy(false);
-    if (err) return setError('La suppression n’a pas pu être faite. Réessayez ou écrivez-nous.');
+    if (err) return setError(tr('La suppression n’a pas pu être faite. Réessayez ou écrivez-nous.'));
     await signOut();
     router.replace('/');
   }
@@ -99,49 +101,49 @@ export default function ProfileScreen() {
     <Screen edges={[]}>
       <Card style={{ gap: space.lg }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, flexWrap: 'wrap' }}>
-          <Avatar name={name || 'Membre'} uri={profile?.avatar_url} size={80} />
+          <Avatar name={name || tr('Membre')} uri={profile?.avatar_url} size={80} />
           <View style={{ flex: 1, minWidth: 180, gap: space.sm }}>
-            <Button kind="secondary" icon="camera-outline" label={profile?.avatar_url ? 'Changer la photo' : 'Ajouter une photo'} loading={photoBusy} onPress={pickPhoto} />
+            <Button kind="secondary" icon="camera-outline" label={profile?.avatar_url ? tr('Changer la photo') : tr('Ajouter une photo')} loading={photoBusy} onPress={pickPhoto} />
             {profile?.avatar_url && !photoBusy ? (
-              <Button kind="secondary" icon="trash-outline" label="Retirer la photo" onPress={() => setPhoto(null)} />
+              <Button kind="secondary" icon="trash-outline" label={tr('Retirer la photo')} onPress={() => setPhoto(null)} />
             ) : null}
           </View>
         </View>
-        <Field label="Nom affiché" value={name} onChangeText={setName} maxLength={80} />
+        <Field label={tr('Nom affiché')} value={name} onChangeText={setName} maxLength={80} />
         <View style={{ gap: space.sm }}>
-          <Text style={{ color: t.text, fontWeight: '600' }}>Je vends en tant que</Text>
+          <Text style={{ color: t.text, fontWeight: '600' }}>{tr('Je vends en tant que')}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {SELLER_TYPES.map((s) => (
-              <Chip key={s.id} label={s.label} selected={type === s.id} onPress={() => setType(s.id)} />
+              <Chip key={s.id} label={tr(s.label)} selected={type === s.id} onPress={() => setType(s.id)} />
             ))}
           </View>
         </View>
         {type !== 'particulier' ? (
           <Field
-            label="Numéro de licence RBQ"
+            label={tr('Numéro de licence RBQ')}
             value={rbq}
             onChangeText={setRbq}
             placeholder="0000-0000-00"
-            hint="Nous vérifions la licence auprès de la Régie du bâtiment avant d’afficher le badge."
+            hint={tr('Nous vérifions la licence auprès de la Régie du bâtiment avant d’afficher le badge.')}
           />
         ) : null}
-        <CityField label="Ville" value={city} onChange={setCity} />
+        <CityField label={tr('Ville')} value={city} onChange={setCity} />
         {error ? <Notice tone="danger">{error}</Notice> : null}
         {message ? <Notice tone="ok" icon="checkmark-circle-outline">{message}</Notice> : null}
-        <Button label="Enregistrer" loading={busy} onPress={save} />
+        <Button label={tr('Enregistrer')} loading={busy} onPress={save} />
       </Card>
 
       <Card>
-        <H2>Supprimer mon compte</H2>
-        <P muted>Vos annonces, messages et évaluations seront supprimés définitivement. Un abonnement en cours doit être annulé dans les réglages de votre téléphone.</P>
+        <H2>{tr('Supprimer mon compte')}</H2>
+        <P muted>{tr('Vos annonces, messages et évaluations seront supprimés définitivement. Un abonnement en cours doit être annulé dans les réglages de votre téléphone.')}</P>
         {confirmDelete ? (
           <View style={{ gap: space.sm }}>
-            <Notice tone="danger" icon="warning-outline">Cette action est définitive.</Notice>
-            <Button kind="danger" label="Oui, supprimer définitivement" loading={busy} onPress={deleteAccount} />
-            <Button kind="secondary" label="Annuler" onPress={() => setConfirmDelete(false)} />
+            <Notice tone="danger" icon="warning-outline">{tr('Cette action est définitive.')}</Notice>
+            <Button kind="danger" label={tr('Oui, supprimer définitivement')} loading={busy} onPress={deleteAccount} />
+            <Button kind="secondary" label={tr('Annuler')} onPress={() => setConfirmDelete(false)} />
           </View>
         ) : (
-          <Button kind="danger" label="Supprimer mon compte" onPress={() => setConfirmDelete(true)} />
+          <Button kind="danger" label={tr('Supprimer mon compte')} onPress={() => setConfirmDelete(true)} />
         )}
       </Card>
     </Screen>

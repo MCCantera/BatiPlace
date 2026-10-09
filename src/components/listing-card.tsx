@@ -5,6 +5,7 @@ import { Icon, ListingImage, Tag } from './ui';
 
 import { conditionLabel, distanceLabel, money } from '@/lib/catalog';
 import type { SearchResult } from '@/lib/database.types';
+import { useI18n } from '@/lib/i18n';
 import { photoUrl } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
@@ -23,6 +24,7 @@ export function ListingCard({
   onToggleFavorite?: () => void;
 }) {
   const t = useTheme();
+  const { tr } = useI18n();
   const pro = listing.seller_type && listing.seller_type !== 'particulier';
   return (
     <Link href={{ pathname: '/annonce/[id]', params: { id: listing.id } }} asChild>
@@ -36,13 +38,13 @@ export function ListingCard({
           <ListingImage uri={photoUrl(listing.photo_path)} categoryId={listing.category_id} style={styles.image} />
           {listing.boosted ? (
             <View style={[styles.badge, { backgroundColor: t.accent }]}>
-              <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 12 }}>En vedette</Text>
+              <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 12 }}>{tr('En vedette')}</Text>
             </View>
           ) : null}
           {onToggleFavorite ? (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              accessibilityLabel={favorite ? tr('Retirer des favoris') : tr('Ajouter aux favoris')}
               onPress={(e) => {
                 e.preventDefault();
                 onToggleFavorite();
@@ -56,7 +58,7 @@ export function ListingCard({
         <View style={styles.body}>
           <Text style={[styles.price, { color: t.text }]}>
             {money(listing.price_cents)}
-            {listing.price_unit ? <Text style={{ fontSize: 12, color: t.muted, fontWeight: '500' }}> {listing.price_unit}</Text> : null}
+            {listing.price_unit ? <Text style={{ fontSize: 12, color: t.muted, fontWeight: '500' }}> {tr(listing.price_unit)}</Text> : null}
           </Text>
           <Text numberOfLines={2} style={{ color: t.text, fontSize: 15, fontWeight: '500', lineHeight: 20 }}>
             {listing.title}
@@ -67,7 +69,7 @@ export function ListingCard({
           </Text>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
             <Tag label={conditionLabel(listing.condition)} tone={listing.condition === 'neuf' ? 'ok' : listing.condition === 'surplus' ? 'accent' : 'neutral'} />
-            {pro ? <Tag label="Pro" tone="brand" /> : null}
+            {pro ? <Tag label={tr('Pro')} tone="brand" /> : null}
           </View>
         </View>
       </Pressable>

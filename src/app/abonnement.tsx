@@ -4,7 +4,8 @@ import { Linking, Platform, Text, View } from 'react-native';
 
 import { Button, Card, H1, Icon, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
-import { FREE_LISTING_LIMIT, SUBSCRIPTION_PRICE } from '@/lib/catalog';
+import { FREE_LISTING_LIMIT, subscriptionPrice } from '@/lib/catalog';
+import { useI18n } from '@/lib/i18n';
 import { buySubscription, purchasesAvailable, restorePurchases, storeName } from '@/lib/purchases';
 import { useSeo } from '@/lib/seo';
 import { space, useTheme } from '@/lib/theme';
@@ -24,6 +25,8 @@ const PERKS = [
 export default function SubscriptionScreen() {
   useSeo({ title: 'Bâtiplace Illimité : annonces illimitées à 9,99 $/mois', description: 'Publiez autant d’annonces que vous voulez sur Bâtiplace pour 9,99 $ par mois. Les 5 premières annonces actives restent gratuites, sans commission.', path: '/abonnement' });
   const t = useTheme();
+  const { tr } = useI18n();
+  const store = tr(storeName);
   const { userId, subscribed, refresh } = useAuth();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -37,12 +40,12 @@ export default function SubscriptionScreen() {
       if (outcome === 'subscribed') {
         // Le webhook met la base à jour en quelques secondes.
         setTimeout(refresh, 3000);
-        setMessage('Merci ! Votre abonnement est actif.');
+        setMessage(tr('Merci ! Votre abonnement est actif.'));
       } else if (outcome === 'unavailable') {
-        setMessage('L’abonnement n’est pas encore offert dans cette version de l’application.');
+        setMessage(tr('L’abonnement n’est pas encore offert dans cette version de l’application.'));
       }
     } catch {
-      setMessage('L’achat n’a pas pu être complété. Aucun montant n’a été facturé.');
+      setMessage(tr('L’achat n’a pas pu être complété. Aucun montant n’a été facturé.'));
     }
     setBusy(false);
   }
@@ -52,48 +55,48 @@ export default function SubscriptionScreen() {
     const ok = await restorePurchases().catch(() => false);
     setBusy(false);
     if (ok) setTimeout(refresh, 3000);
-    setMessage(ok ? 'Abonnement restauré.' : `Aucun abonnement trouvé sur ce compte ${storeName}.`);
+    setMessage(ok ? tr('Abonnement restauré.') : tr('Aucun abonnement trouvé sur ce compte {store}.', { store }));
   }
 
   return (
     <Screen edges={[]}>
-      <H1>Bâtiplace Illimité</H1>
+      <H1>{tr('Bâtiplace Illimité')}</H1>
       <P muted>
-        Le forfait gratuit permet {FREE_LISTING_LIMIT} annonces actives. Avec Illimité, publiez autant que vous voulez.
+        {tr('Le forfait gratuit permet {n} annonces actives. Avec Illimité, publiez autant que vous voulez.', { n: FREE_LISTING_LIMIT })}
       </P>
       <Card style={{ gap: space.md }}>
         <Text style={{ fontSize: 40, fontWeight: '800', color: t.text }}>
-          {SUBSCRIPTION_PRICE} <Text style={{ fontSize: 16, fontWeight: '500', color: t.muted }}>/ mois, taxes en sus</Text>
+          {subscriptionPrice()} <Text style={{ fontSize: 16, fontWeight: '500', color: t.muted }}>{tr('/ mois, taxes en sus')}</Text>
         </Text>
         {PERKS.map((p) => (
           <View key={p} style={{ flexDirection: 'row', gap: space.sm, alignItems: 'center' }}>
             <Icon name="checkmark-circle" color={t.ok} />
-            <Text style={{ color: t.text, fontSize: 15 }}>{p}</Text>
+            <Text style={{ color: t.text, fontSize: 15 }}>{tr(p)}</Text>
           </View>
         ))}
       </Card>
 
       {subscribed ? (
         <Notice tone="ok" icon="checkmark-circle-outline">
-          Votre abonnement est actif. Pour l’annuler ou le modifier, ouvrez les réglages d’abonnement de votre téléphone ({storeName}).
+          {tr('Votre abonnement est actif. Pour l’annuler ou le modifier, ouvrez les réglages d’abonnement de votre téléphone ({store}).', { store })}
         </Notice>
       ) : Platform.OS === 'web' ? (
         <Notice icon="phone-portrait-outline">
-          L’abonnement s’achète dans l’application Bâtiplace sur iPhone ou Android, avec votre compte App Store ou Google Play. Connectez-vous ensuite ici avec le même compte : vos annonces illimitées fonctionnent aussi sur le site Web.
+          {tr('L’abonnement s’achète dans l’application Bâtiplace sur iPhone ou Android, avec votre compte App Store ou Google Play. Connectez-vous ensuite ici avec le même compte : vos annonces illimitées fonctionnent aussi sur le site Web.')}
         </Notice>
       ) : (
         <View style={{ gap: space.sm }}>
-          <Button label={`S’abonner avec ${storeName}`} icon="card-outline" loading={busy} onPress={subscribe} disabled={!purchasesAvailable} />
-          <Button kind="secondary" label="Restaurer un achat" onPress={restore} disabled={busy || !purchasesAvailable} />
+          <Button label={tr('S’abonner avec {store}', { store })} icon="card-outline" loading={busy} onPress={subscribe} disabled={!purchasesAvailable} />
+          <Button kind="secondary" label={tr('Restaurer un achat')} onPress={restore} disabled={busy || !purchasesAvailable} />
           <P muted style={{ fontSize: 12 }}>
-            Abonnement mensuel renouvelé automatiquement, facturé à votre compte {storeName}. Annulable en tout temps dans les réglages de votre téléphone, au moins 24 h avant la fin de la période en cours.
+            {tr('Abonnement mensuel renouvelé automatiquement, facturé à votre compte {store}. Annulable en tout temps dans les réglages de votre téléphone, au moins 24 h avant la fin de la période en cours.', { store })}
           </P>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
             <Text onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
-              Conditions d’utilisation
+              {tr('Conditions d’utilisation')}
             </Text>
             <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
-              Politique de confidentialité
+              {tr('Politique de confidentialité')}
             </Text>
           </View>
         </View>

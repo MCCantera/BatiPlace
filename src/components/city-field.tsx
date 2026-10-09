@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 
 import { Icon } from '@/components/ui';
 import { findCity, searchCities } from '@/lib/catalog';
+import { useI18n } from '@/lib/i18n';
 import { radius, space, useTheme } from '@/lib/theme';
 
 /**
@@ -13,7 +14,7 @@ export function CityField({
   label,
   value,
   onChange,
-  placeholder = 'Tapez une ville du Québec',
+  placeholder,
   autoFocus,
   pickOnly,
 }: {
@@ -26,6 +27,7 @@ export function CityField({
   pickOnly?: boolean;
 }) {
   const t = useTheme();
+  const { tr } = useI18n();
   const [text, setText] = useState(value);
   const [focused, setFocused] = useState(false);
   const [picked, setPicked] = useState(!!value);
@@ -65,7 +67,7 @@ export function CityField({
           // Leave time for a tap on a suggestion before the list disappears.
           onBlur={() => setTimeout(() => setFocused(false), 150)}
           onSubmitEditing={() => suggestions[0] && pick(suggestions[0])}
-          placeholder={placeholder}
+          placeholder={placeholder ?? tr('Tapez une ville du Québec')}
           placeholderTextColor={t.muted}
           autoCorrect={false}
           autoCapitalize="words"
@@ -92,9 +94,9 @@ export function CityField({
         </View>
       ) : null}
       {focused && text.trim() && !picked && !suggestions.length ? (
-        <Text style={{ color: t.muted, fontSize: 13 }}>Aucune ville du Québec ne correspond.</Text>
+        <Text style={{ color: t.muted, fontSize: 13 }}>{tr('Aucune ville du Québec ne correspond.')}</Text>
       ) : null}
-      {unknown ? <Text style={{ color: t.danger, fontSize: 13 }}>Choisissez une ville dans la liste.</Text> : null}
+      {unknown ? <Text style={{ color: t.danger, fontSize: 13 }}>{tr('Choisissez une ville dans la liste.')}</Text> : null}
     </View>
   );
 }

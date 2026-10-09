@@ -4,11 +4,13 @@ import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, Vi
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CityField } from '@/components/city-field';
+import { LanguageToggle } from '@/components/language-toggle';
 import { ListingCard } from '@/components/listing-card';
 import { Button, Chip, Empty, Icon, Loading, P } from '@/components/ui';
 import { CATEGORIES, CITY_NAMES, CONDITIONS, category, conditionLabel, money } from '@/lib/catalog';
 import type { ListingCondition, SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { tr, useI18n } from '@/lib/i18n';
 import { useOrigin } from '@/lib/location';
 import { useSeo } from '@/lib/seo';
 import { parseSmartQuery, type SmartQuery } from '@/lib/smart-search';
@@ -37,6 +39,7 @@ function ChipRow({ wide, gap = space.sm, children }: { wide: boolean; gap?: numb
 export default function ExploreScreen() {
   useSeo({ path: '/' });
   const t = useTheme();
+  const { tr } = useI18n();
   const { width } = useWindowDimensions();
   const { origin, radiusKm, setRadiusKm, setCity, useDeviceLocation } = useOrigin();
   const favorites = useFavorites();
@@ -94,11 +97,11 @@ export default function ExploreScreen() {
     const fallbackCats = smart && query && !cats.length ? smart.categories : [];
     const useFallback = !err && !data?.length && fallbackCats.length > 0;
     if (useFallback) ({ data, error: err } = await supabase.rpc('search_listings', { ...args, q: null, categories: fallbackCats }));
-    if (err) setError('Impossible de charger les annonces. Vérifiez votre connexion.');
+    if (err) setError(tr('Impossible de charger les annonces. Vérifiez votre connexion.'));
     const max = smart?.maxPriceCents;
     setFallback(useFallback);
     setResults((data ?? []).filter((l) => !max || l.price_cents <= max));
-  }, [origin, radiusKm, query, cats, conds, proOnly, sort, smart]);
+  }, [origin, radiusKm, query, cats, conds, proOnly, sort, smart, tr]);
 
   useEffect(() => {
     load();
@@ -119,24 +122,26 @@ export default function ExploreScreen() {
           <Text style={{ fontSize: 34, fontWeight: '800', color: t.text, letterSpacing: -0.8, lineHeight: 38 }}>
             Bâti<Text style={{ color: t.brand }}>place</Text>
           </Text>
-          <Text style={{ fontSize: 15, color: t.muted }}>Le marketplace de la construction au Québec</Text>
+          <Text style={{ fontSize: 15, color: t.muted }}>{tr('Le marketplace de la construction au Québec')}</Text>
         </View>
+        <LanguageToggle />
       </View>
 
       <View style={[styles.hero, { backgroundColor: t.accentSoft }]}>
         <Text style={{ fontSize: 24, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
-          Le surplus des uns, <Text style={{ color: t.accent }}>le chantier des autres.</Text>
+          {tr('Le surplus des uns,')} <Text style={{ color: t.accent }}>{tr('le chantier des autres.')}</Text>
         </Text>
         <P muted>
-          Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et
-          professionnels, partout au Québec. Publication gratuite, zéro commission.
+          {tr(
+            'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.',
+          )}
         </P>
         <Pressable
           accessibilityRole="link"
           onPress={() => router.push('/partenaires')}
           style={({ pressed }) => [styles.partners, { backgroundColor: t.surface }, pressed && { opacity: 0.85 }]}>
           <Icon name="pricetags-outline" size={18} color={t.accent} />
-          <Text style={{ color: t.text, fontWeight: '700', flexShrink: 1 }}>Rabais exclusifs chez nos partenaires</Text>
+          <Text style={{ color: t.text, fontWeight: '700', flexShrink: 1 }}>{tr('Rabais exclusifs chez nos partenaires')}</Text>
           <Icon name="chevron-forward" size={16} color={t.muted} />
         </Pressable>
       </View>
@@ -147,8 +152,8 @@ export default function ExploreScreen() {
         style={({ pressed }) => [styles.contractors, { backgroundColor: t.brand }, pressed && { opacity: 0.9 }]}>
         <Icon name="construct-outline" size={26} color={t.brandText} />
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={{ color: t.brandText, fontWeight: '800', fontSize: 17 }}>Vous cherchez un entrepreneur ?</Text>
-          <Text style={{ color: t.brandText, opacity: 0.85 }}>Trouvez un pro près de chez vous pour vos travaux.</Text>
+          <Text style={{ color: t.brandText, fontWeight: '800', fontSize: 17 }}>{tr('Vous cherchez un entrepreneur ?')}</Text>
+          <Text style={{ color: t.brandText, opacity: 0.85 }}>{tr('Trouvez un pro près de chez vous pour vos travaux.')}</Text>
         </View>
         <Icon name="chevron-forward" color={t.brandText} />
       </Pressable>
@@ -162,18 +167,18 @@ export default function ExploreScreen() {
             if (!v.trim()) clearSearch();
           }}
           onSubmitEditing={runSearch}
-          placeholder="Ex. : je cherche de la céramique à Laval"
+          placeholder={tr('Ex. : je cherche de la céramique à Laval')}
           placeholderTextColor={t.muted}
           style={{ flex: 1, minWidth: 0, fontSize: 16, color: t.text, paddingVertical: 8 }}
           returnKeyType="search"
-          accessibilityLabel="Rechercher"
+          accessibilityLabel={tr('Rechercher')}
         />
         <Pressable
           accessibilityRole="button"
           onPress={runSearch}
           style={({ pressed }) => [styles.searchBtn, { backgroundColor: t.accent }, pressed && { opacity: 0.85 }]}>
           <Icon name="search" size={16} color={t.accentText} />
-          <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 15 }}>Rechercher</Text>
+          <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 15 }}>{tr('Rechercher')}</Text>
         </Pressable>
       </View>
 
@@ -184,11 +189,14 @@ export default function ExploreScreen() {
             <Text style={{ color: t.text, fontWeight: '600' }}>{assistantSummary(smart, origin.label)}</Text>
             {fallback ? (
               <Text style={{ color: t.muted, fontSize: 13 }}>
-                {`Aucune annonce ne mentionne « ${smart.keywords.join(' ')} » pour l’instant. Voici les annonces de ${smart.categories.map((c) => category(c).name).join(', ')}.`}
+                {tr('Aucune annonce ne mentionne « {words} » pour l’instant. Voici les annonces de {cats}.', {
+                  words: smart.keywords.join(' '),
+                  cats: smart.categories.map((c) => tr(category(c).name)).join(', '),
+                })}
               </Text>
             ) : null}
           </View>
-          <Pressable accessibilityRole="button" accessibilityLabel="Effacer la recherche" onPress={clearSearch} hitSlop={8}>
+          <Pressable accessibilityRole="button" accessibilityLabel={tr('Effacer la recherche')} onPress={clearSearch} hitSlop={8}>
             <Icon name="close" size={18} color={t.muted} />
           </Pressable>
         </View>
@@ -202,34 +210,34 @@ export default function ExploreScreen() {
         </Pressable>
         <ChipRow wide={wide}>
           {RADII.map((r) => (
-            <Chip key={r} label={r >= 1500 ? 'Tout le Québec' : `${r} km`} selected={radiusKm === r} onPress={() => setRadiusKm(r)} />
+            <Chip key={r} label={r >= 1500 ? tr('Tout le Québec') : `${r} km`} selected={radiusKm === r} onPress={() => setRadiusKm(r)} />
           ))}
         </ChipRow>
       </View>
 
       <ChipRow wide={wide}>
-        <Chip label="Tout" selected={cats.length === 0} onPress={() => setCats([])} />
+        <Chip label={tr('Tout')} selected={cats.length === 0} onPress={() => setCats([])} />
         {CATEGORIES.map((c) => (
-          <Chip key={c.id} label={c.name} dot={c.ink} selected={cats.includes(c.id)} onPress={() => setCats(toggle(cats, c.id))} />
+          <Chip key={c.id} label={tr(c.name)} dot={c.ink} selected={cats.includes(c.id)} onPress={() => setCats(toggle(cats, c.id))} />
         ))}
       </ChipRow>
 
       <ChipRow wide={wide}>
         {CONDITIONS.map((c) => (
-          <Chip key={c.id} label={c.label} selected={conds.includes(c.id)} onPress={() => setConds(toggle(conds, c.id))} />
+          <Chip key={c.id} label={tr(c.label)} selected={conds.includes(c.id)} onPress={() => setConds(toggle(conds, c.id))} />
         ))}
-        <Chip label="Particuliers" selected={proOnly === false} onPress={() => setProOnly(proOnly === false ? null : false)} />
-        <Chip label="Professionnels" selected={proOnly === true} onPress={() => setProOnly(proOnly === true ? null : true)} />
+        <Chip label={tr('Particuliers')} selected={proOnly === false} onPress={() => setProOnly(proOnly === false ? null : false)} />
+        <Chip label={tr('Professionnels')} selected={proOnly === true} onPress={() => setProOnly(proOnly === true ? null : true)} />
       </ChipRow>
 
       <View style={[styles.row, { justifyContent: 'space-between' }]}>
         <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flexShrink: 0 }}>
-          {results ? `${results.length} annonce${results.length > 1 ? 's' : ''}` : ' '}
+          {results ? tr(results.length > 1 ? '{n} annonces' : '{n} annonce', { n: results.length }) : ' '}
         </Text>
         <ChipRow wide={wide} gap={space.xs}>
           {SORTS.map((s) => (
             <Pressable key={s.id} onPress={() => setSort(s.id)} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
-              <Text style={{ color: sort === s.id ? t.accent : t.muted, fontWeight: sort === s.id ? '700' : '500', fontSize: 13 }}>{s.label}</Text>
+              <Text style={{ color: sort === s.id ? t.accent : t.muted, fontWeight: sort === s.id ? '700' : '500', fontSize: 13 }}>{tr(s.label)}</Text>
             </Pressable>
           ))}
         </ChipRow>
@@ -260,9 +268,13 @@ export default function ExploreScreen() {
             <Loading />
           ) : (
             <Empty
-              title={isSupabaseConfigured ? 'Aucune annonce ne correspond' : 'Base de données pas encore branchée'}
-              body={isSupabaseConfigured ? 'Élargissez le rayon ou retirez un filtre. Ou soyez le premier à publier ici.' : 'Ajoutez EXPO_PUBLIC_SUPABASE_URL et EXPO_PUBLIC_SUPABASE_KEY dans .env.'}
-              action={<Button label="Publier une annonce" icon="add" onPress={() => router.push('/publier')} />}
+              title={isSupabaseConfigured ? tr('Aucune annonce ne correspond') : tr('Base de données pas encore branchée')}
+              body={
+                isSupabaseConfigured
+                  ? tr('Élargissez le rayon ou retirez un filtre. Ou soyez le premier à publier ici.')
+                  : tr('Ajoutez EXPO_PUBLIC_SUPABASE_URL et EXPO_PUBLIC_SUPABASE_KEY dans .env.')
+              }
+              action={<Button label={tr('Publier une annonce')} icon="add" onPress={() => router.push('/publier')} />}
             />
           )
         }
@@ -271,9 +283,9 @@ export default function ExploreScreen() {
       <Modal visible={picker} transparent animationType="fade" onRequestClose={() => setPicker(false)}>
         <Pressable style={styles.overlay} onPress={() => setPicker(false)}>
           <Pressable style={[styles.sheet, { backgroundColor: t.surface }]}>
-            <Text style={{ fontSize: 18, fontWeight: '800', color: t.text }}>Rechercher autour de</Text>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: t.text }}>{tr('Rechercher autour de')}</Text>
             <Button
-              label="Utiliser ma position"
+              label={tr('Utiliser ma position')}
               icon="navigate"
               kind="brand"
               onPress={async () => {
@@ -290,7 +302,7 @@ export default function ExploreScreen() {
                 setPicker(false);
               }}
             />
-            <Text style={{ color: t.muted, fontSize: 13, fontWeight: '600' }}>Grandes villes</Text>
+            <Text style={{ color: t.muted, fontSize: 13, fontWeight: '600' }}>{tr('Grandes villes')}</Text>
             <ScrollView style={{ maxHeight: 300 }}>
               {CITY_NAMES.map((c) => (
                 <Pressable
@@ -313,11 +325,14 @@ export default function ExploreScreen() {
 }
 
 function assistantSummary(s: SmartQuery, place: string) {
-  const parts = [s.keywords.length ? `Je cherche « ${s.keywords.join(' ')} »` : 'Je cherche des annonces', `autour de ${place}`];
+  const parts = [
+    s.keywords.length ? tr('Je cherche « {words} »', { words: s.keywords.join(' ') }) : tr('Je cherche des annonces'),
+    tr('autour de {place}', { place }),
+  ];
   if (s.condition) parts.push(conditionLabel(s.condition).toLowerCase());
-  if (s.proOnly === true) parts.push('chez les professionnels');
-  if (s.proOnly === false) parts.push('chez les particuliers');
-  if (s.maxPriceCents) parts.push(`${money(s.maxPriceCents)} maximum`);
+  if (s.proOnly === true) parts.push(tr('chez les professionnels'));
+  if (s.proOnly === false) parts.push(tr('chez les particuliers'));
+  if (s.maxPriceCents) parts.push(tr('{price} maximum', { price: money(s.maxPriceCents) }));
   return parts.join(', ') + '.';
 }
 

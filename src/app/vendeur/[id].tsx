@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { sellerTypeLabel } from '@/lib/catalog';
 import type { Listing, Profile, Review } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { locale, useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
@@ -20,6 +21,7 @@ type ReviewRow = Review & { author: { display_name: string } | null };
 export default function SellerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useTheme();
+  const { tr } = useI18n();
   const { width } = useWindowDimensions();
   const { userId } = useAuth();
   const favorites = useFavorites();
@@ -64,7 +66,7 @@ export default function SellerScreen() {
   );
 
   if (profile === undefined) return <Loading />;
-  if (profile === null) return <Screen edges={[]}><Empty title="Ce profil n’existe plus" /></Screen>;
+  if (profile === null) return <Screen edges={[]}><Empty title={tr('Ce profil n’existe plus')} /></Screen>;
 
   const average = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
   const columns = width >= 1000 ? 3 : 2;
@@ -72,12 +74,12 @@ export default function SellerScreen() {
 
   async function sendReview() {
     setError('');
-    if (!stars) return setError('Choisissez une note de 1 à 5 étoiles.');
+    if (!stars) return setError(tr('Choisissez une note de 1 à 5 étoiles.'));
     const { error: err } = await supabase.from('reviews').insert({ seller_id: profile!.id, rating: stars, body: body.trim() });
     if (err) {
       return setError(
         err.message.includes('row-level security')
-          ? 'Vous pouvez évaluer un vendeur après lui avoir écrit au sujet d’une annonce.'
+          ? tr('Vous pouvez évaluer un vendeur après lui avoir écrit au sujet d’une annonce.')
           : friendlyError(err),
       );
     }
@@ -87,31 +89,31 @@ export default function SellerScreen() {
 
   return (
     <Screen edges={[]}>
-      <Stack.Screen options={{ title: profile.display_name || 'Vendeur' }} />
+      <Stack.Screen options={{ title: profile.display_name || tr('Vendeur') }} />
       <Card style={{ flexDirection: 'row', gap: space.lg, alignItems: 'center', flexWrap: 'wrap' }}>
         <Avatar name={profile.display_name} uri={profile.avatar_url} size={72} />
         <View style={{ flex: 1, minWidth: 200, gap: 4 }}>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             <Tag label={sellerTypeLabel(profile.seller_type)} tone={profile.seller_type === 'particulier' ? 'neutral' : 'brand'} />
           </View>
-          <H1 style={{ fontSize: 26 }}>{profile.display_name || 'Membre Bâtiplace'}</H1>
+          <H1 style={{ fontSize: 26 }}>{profile.display_name || tr('Membre Bâtiplace')}</H1>
           <P muted>
-            {profile.city ? `${profile.city} · ` : ''}Membre depuis {new Date(profile.created_at).getFullYear()}
+            {profile.city ? `${profile.city} · ` : ''}{tr('Membre depuis {year}', { year: new Date(profile.created_at).getFullYear() })}
           </P>
           {profile.rbq_verified && profile.rbq_license ? (
-            <Text style={{ color: t.ok, fontWeight: '600' }}>Licence RBQ {profile.rbq_license} vérifiée</Text>
+            <Text style={{ color: t.ok, fontWeight: '600' }}>{tr('Licence RBQ {n} vérifiée', { n: profile.rbq_license })}</Text>
           ) : null}
         </View>
         <View style={{ alignItems: 'center', gap: 4 }}>
           <Text style={{ fontSize: 28, fontWeight: '800', color: t.text }}>{reviews.length ? average.toFixed(1) : '—'}</Text>
           <Stars value={average} />
-          <Text style={{ color: t.muted, fontSize: 12 }}>{reviews.length} évaluation{reviews.length > 1 ? 's' : ''}</Text>
+          <Text style={{ color: t.muted, fontSize: 12 }}>{tr(reviews.length > 1 ? '{n} évaluations' : '{n} évaluation', { n: reviews.length })}</Text>
         </View>
       </Card>
 
-      <H2>Annonces ({listings.length})</H2>
+      <H2>{tr('Annonces ({n})', { n: listings.length })}</H2>
       {listings.length === 0 ? (
-        <Empty title="Aucune annonce active" />
+        <Empty title={tr('Aucune annonce active')} />
       ) : (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
           {listings.map((l) => (
@@ -126,37 +128,37 @@ export default function SellerScreen() {
         </View>
       )}
 
-      <H2>Évaluations</H2>
+      <H2>{tr('Évaluations')}</H2>
       <Card>
-        {reviews.length === 0 ? <P muted>Pas encore d’évaluation.</P> : null}
+        {reviews.length === 0 ? <P muted>{tr('Pas encore d’évaluation.')}</P> : null}
         {reviews.map((r) => (
           <View key={r.id} style={{ gap: 4, paddingBottom: space.md, borderBottomWidth: 1, borderColor: t.line }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ color: t.text, fontWeight: '700' }}>{r.author?.display_name ?? 'Membre'}</Text>
-              <Text style={{ color: t.muted, fontSize: 12 }}>{new Date(r.created_at).toLocaleDateString('fr-CA')}</Text>
+              <Text style={{ color: t.text, fontWeight: '700' }}>{r.author?.display_name ?? tr('Membre')}</Text>
+              <Text style={{ color: t.muted, fontSize: 12 }}>{new Date(r.created_at).toLocaleDateString(locale())}</Text>
             </View>
             <Stars value={r.rating} />
             {r.body ? <P>{r.body}</P> : null}
           </View>
         ))}
 
-        {sent ? <Notice tone="ok" icon="checkmark-circle-outline">Merci, votre évaluation est publiée.</Notice> : null}
+        {sent ? <Notice tone="ok" icon="checkmark-circle-outline">{tr('Merci, votre évaluation est publiée.')}</Notice> : null}
         {canReview && !sent ? (
           <View style={{ gap: space.md }}>
-            <Text style={{ color: t.text, fontWeight: '700' }}>Vous avez fait affaire avec ce vendeur ?</Text>
+            <Text style={{ color: t.text, fontWeight: '700' }}>{tr('Vous avez fait affaire avec ce vendeur ?')}</Text>
             <View style={{ flexDirection: 'row', gap: 4 }}>
               {[1, 2, 3, 4, 5].map((n) => (
-                <Pressable key={n} onPress={() => setStars(n)} accessibilityLabel={`${n} étoile${n > 1 ? 's' : ''}`} hitSlop={6}>
+                <Pressable key={n} onPress={() => setStars(n)} accessibilityLabel={tr(n > 1 ? '{n} étoiles' : '{n} étoile', { n })} hitSlop={6}>
                   <Icon name={n <= stars ? 'star' : 'star-outline'} size={30} color={n <= stars ? t.accent : t.line} />
                 </Pressable>
               ))}
             </View>
-            <Field label="Votre commentaire" value={body} onChangeText={setBody} multiline maxLength={1000} placeholder="État de l’article, ponctualité, communication…" />
+            <Field label={tr('Votre commentaire')} value={body} onChangeText={setBody} multiline maxLength={1000} placeholder={tr('État de l’article, ponctualité, communication…')} />
             {error ? <P style={{ color: t.danger }}>{error}</P> : null}
-            <Button kind="brand" label="Publier l’évaluation" onPress={sendReview} />
+            <Button kind="brand" label={tr('Publier l’évaluation')} onPress={sendReview} />
           </View>
         ) : null}
-        {!userId ? <Button kind="secondary" label="Se connecter pour évaluer" onPress={() => router.push('/connexion')} /> : null}
+        {!userId ? <Button kind="secondary" label={tr('Se connecter pour évaluer')} onPress={() => router.push('/connexion')} /> : null}
       </Card>
     </Screen>
   );

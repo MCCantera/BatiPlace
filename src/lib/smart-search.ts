@@ -21,7 +21,10 @@ const FILLER = new Set(
   svp merci bonjour salut allo hey s il plait vendre vend vente vendeur peu pas cher cheres chers chere prix
   autour pres proche vers region coin secteur environ moins max maximum budget dollars dollar piasses
   neuf neuve neufs neuves usage usagee usages usagees occasion seconde main surplus entrepreneur entrepreneurs
-  pro pros professionnel professionnels particulier particuliers louer location rive sud nord`.split(/\s+/),
+  pro pros professionnel professionnels particulier particuliers louer location rive sud nord
+  i im am m looking look searching search need needs want wanted would like some any the an of in at near around to buy
+  find for from please hi hello is there anyone selling sale cheap under less than new brand used second hand
+  contractor contractors professional professionals individual individuals rent rental`.split(/\s+/),
 );
 
 // Common words mapped to a category, used when keywords alone find nothing.
@@ -45,30 +48,46 @@ const CATEGORY_WORDS: Record<string, CategoryId> = {
   prise: 'electricite', interrupteur: 'electricite', electrique: 'electricite', electricite: 'electricite',
   porte: 'portes-fenetres', fenetre: 'portes-fenetres', vitre: 'portes-fenetres', moustiquaire: 'portes-fenetres',
   thermos: 'portes-fenetres', cadrage: 'portes-fenetres', moulure: 'portes-fenetres',
+  // English
+  wood: 'bois', lumber: 'bois', plywood: 'bois', beam: 'bois', joist: 'bois', plank: 'bois', board: 'bois', spruce: 'bois',
+  pine: 'bois', cedar: 'bois', oak: 'bois', maple: 'bois',
+  tile: 'revetements', ceramic: 'revetements', floor: 'revetements', flooring: 'revetements', vinyl: 'revetements',
+  shingle: 'revetements', siding: 'revetements', laminate: 'revetements', carpet: 'revetements',
+  drywall: 'materiaux', gypsum: 'materiaux', insulation: 'materiaux', cement: 'materiaux', concrete: 'materiaux',
+  brick: 'materiaux', stone: 'materiaux', sand: 'materiaux', gravel: 'materiaux', paint: 'materiaux', screw: 'materiaux', nail: 'materiaux',
+  saw: 'outils', drill: 'outils', hammer: 'outils', grinder: 'outils', sander: 'outils', nailer: 'outils', tool: 'outils', level: 'outils',
+  scaffold: 'equipements', scaffolding: 'equipements', ladder: 'equipements', compressor: 'equipements', generator: 'equipements',
+  mixer: 'equipements', trailer: 'equipements',
+  excavator: 'machinerie', loader: 'machinerie', forklift: 'machinerie', tractor: 'machinerie', lift: 'machinerie',
+  toilet: 'plomberie', sink: 'plomberie', faucet: 'plomberie', shower: 'plomberie', bathtub: 'plomberie', tub: 'plomberie',
+  pipe: 'plomberie', heater: 'plomberie', plumbing: 'plomberie',
+  wire: 'electricite', wiring: 'electricite', breaker: 'electricite', light: 'electricite', outlet: 'electricite',
+  switch: 'electricite', electrical: 'electricite',
+  door: 'portes-fenetres', window: 'portes-fenetres', glass: 'portes-fenetres', trim: 'portes-fenetres',
 };
 
 // « planches » → « planche », « tuyaux » → « tuyau », so a search matches singular and plural.
 const stem = (w: string) => (w.length > 3 && /[sx]$/.test(w) && !/(ss|is|os|us)$/.test(w) ? w.slice(0, -1) : w);
 
-const CITY_LEAD = new Set(['a', 'au', 'aux', 'de', 'pres', 'proche', 'vers', 'dans', 'en', 'sur', 'autour', 'secteur', 'region']);
+const CITY_LEAD = new Set(['a', 'au', 'aux', 'de', 'pres', 'proche', 'vers', 'dans', 'en', 'sur', 'autour', 'secteur', 'region', 'in', 'near', 'around', 'at']);
 
 export function parseSmartQuery(text: string): SmartQuery {
   const result: SmartQuery = { keywords: [], categories: [] };
   let s = fold(text.replace(/[’']/g, ' '));
 
-  const price = s.match(/(?:moins de|max(?:imum)?|budget(?: de)?|pas plus de|sous)\s*(\d+(?:[ .,]\d+)?)|(\d+(?:[.,]\d+)?)\s*(?:\$|dollars?|piasses)?\s*(?:max(?:imum)?|ou moins)/);
+  const price = s.match(/(?:moins de|max(?:imum)?|budget(?: de| of)?|pas plus de|sous|under|less than|below|no more than)\s*(\d+(?:[ .,]\d+)?)|(\d+(?:[.,]\d+)?)\s*(?:\$|dollars?|piasses)?\s*(?:max(?:imum)?|ou moins|or less)/);
   if (price) {
     const n = parseFloat((price[1] ?? price[2]).replace(/\s/g, '').replace(',', '.'));
     if (Number.isFinite(n) && n > 0) result.maxPriceCents = Math.round(n * 100);
     s = s.replace(price[0], ' ');
   }
 
-  if (/\b(neuf|neuve|neufs|neuves)\b/.test(s)) result.condition = 'neuf';
-  else if (/\b(usage|usagee|usages|usagees|occasion|seconde main)\b/.test(s)) result.condition = 'usage';
+  if (/\b(neuf|neuve|neufs|neuves|new|brand new)\b/.test(s)) result.condition = 'neuf';
+  else if (/\b(usage|usagee|usages|usagees|occasion|seconde main|used|second hand|secondhand)\b/.test(s)) result.condition = 'usage';
   else if (/\bsurplus\b/.test(s)) result.condition = 'surplus';
 
-  if (/\b(entrepreneurs?|pros?|professionnels?|fournisseurs?)\b/.test(s)) result.proOnly = true;
-  else if (/\bparticuliers?\b/.test(s)) result.proOnly = false;
+  if (/\b(entrepreneurs?|pros?|professionnels?|fournisseurs?|contractors?|professionals?|suppliers?)\b/.test(s)) result.proOnly = true;
+  else if (/\b(particuliers?|individuals?)\b/.test(s)) result.proOnly = false;
 
   const words = s.split(' ').filter(Boolean);
   // City: the longest run of 1 to 5 words after « à », « près de »… that names a Québec municipality.

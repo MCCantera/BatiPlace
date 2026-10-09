@@ -7,6 +7,7 @@ import { Avatar, Empty, H1, Loading, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { timeAgo } from '@/lib/catalog';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
+import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
@@ -15,8 +16,9 @@ type Summary = { last: string; mine: boolean; unread: number };
 
 export default function MessagesScreen() {
   useSeo({ title: 'Messages', noindex: true });
+  const { tr } = useI18n();
   return (
-    <RequireAuth title="Messages" reason="Écrivez aux vendeurs et répondez aux acheteurs, sans partager votre numéro.">
+    <RequireAuth title={tr('Messages')} reason={tr('Écrivez aux vendeurs et répondez aux acheteurs, sans partager votre numéro.')}>
       <Inbox />
     </RequireAuth>
   );
@@ -24,6 +26,7 @@ export default function MessagesScreen() {
 
 function Inbox() {
   const t = useTheme();
+  const { tr } = useI18n();
   const { userId } = useAuth();
   const [rows, setRows] = useState<ConversationRow[] | null>(null);
   const [summaries, setSummaries] = useState<Record<string, Summary>>({});
@@ -61,11 +64,11 @@ function Inbox() {
 
   return (
     <Screen>
-      <H1>Messages</H1>
+      <H1>{tr('Messages')}</H1>
       {rows === null ? (
         <Loading />
       ) : rows.length === 0 ? (
-        <Empty title="Aucune conversation" body="Touchez « Contacter le vendeur » sur une annonce pour démarrer une conversation." />
+        <Empty title={tr('Aucune conversation')} body={tr('Touchez « Contacter le vendeur » sur une annonce pour démarrer une conversation.')} />
       ) : (
         <View style={[styles.list, { borderColor: t.line, backgroundColor: t.surface }]}>
           {rows.map((c) => {
@@ -78,13 +81,13 @@ function Inbox() {
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.sm }}>
                       <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flex: 1 }}>
-                        {other?.display_name || 'Membre Bâtiplace'}
+                        {other?.display_name || tr('Membre Bâtiplace')}
                       </Text>
                       <Text style={{ color: t.muted, fontSize: 12 }}>{timeAgo(c.last_message_at)}</Text>
                     </View>
-                    <Text numberOfLines={1} style={{ color: t.text, fontSize: 13 }}>{c.listing?.title ?? 'Annonce retirée'}</Text>
+                    <Text numberOfLines={1} style={{ color: t.text, fontSize: 13 }}>{c.listing?.title ?? tr('Annonce retirée')}</Text>
                     <Text numberOfLines={1} style={{ color: t.muted, fontSize: 13 }}>
-                      {s ? `${s.mine ? 'Vous : ' : ''}${s.last}` : 'Pas encore de message'}
+                      {s ? `${s.mine ? tr('Vous : ') : ''}${s.last}` : tr('Pas encore de message')}
                     </Text>
                   </View>
                   {s?.unread ? (

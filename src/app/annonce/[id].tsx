@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { category, conditionLabel, money, sellerTypeLabel, timeAgo } from '@/lib/catalog';
 import type { Listing, Profile } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { useI18n } from '@/lib/i18n';
 import { listingSeo, useSeo } from '@/lib/seo';
 import { friendlyError, photoUrl, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
@@ -19,6 +20,7 @@ type Detail = Listing & {
 export default function ListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useTheme();
+  const { tr } = useI18n();
   const { width } = useWindowDimensions();
   const { userId } = useAuth();
   const favorites = useFavorites();
@@ -57,7 +59,7 @@ export default function ListingScreen() {
   if (item === null)
     return (
       <Screen edges={[]}>
-        <Empty title="Cette annonce n’est plus disponible" body="Elle a peut-être été vendue ou retirée." action={<Button label="Retour aux annonces" onPress={() => router.replace('/')} />} />
+        <Empty title={tr('Cette annonce n’est plus disponible')} body={tr('Elle a peut-être été vendue ou retirée.')} action={<Button label={tr('Retour aux annonces')} onPress={() => router.replace('/')} />} />
       </Screen>
     );
 
@@ -82,7 +84,7 @@ export default function ListingScreen() {
       convId = data?.id;
     }
     setBusy(false);
-    if (convId) router.push({ pathname: '/conversation/[id]', params: { id: convId, draft: 'Bonjour, est-ce encore disponible ?' } });
+    if (convId) router.push({ pathname: '/conversation/[id]', params: { id: convId, draft: tr('Bonjour, est-ce encore disponible ?') } });
   }
 
   const gallery = (
@@ -101,10 +103,10 @@ export default function ListingScreen() {
   );
 
   const facts: [string, string][] = [
-    ['Quantité', item.quantity],
-    ['Ville', item.city],
-    ['Format', item.spec || '—'],
-    ['Publiée', `${timeAgo(item.created_at)} · ${item.views} vues`],
+    [tr('Quantité'), item.quantity],
+    [tr('Ville'), item.city],
+    [tr('Format'), item.spec || '—'],
+    [tr('Publiée'), `${timeAgo(item.created_at)} · ${tr(item.views === 1 ? '{n} vue' : '{n} vues', { n: item.views })}`],
   ];
 
   const summary = (
@@ -112,12 +114,12 @@ export default function ListingScreen() {
       <Card>
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           <Tag label={conditionLabel(item.condition)} tone={item.condition === 'neuf' ? 'ok' : item.condition === 'surplus' ? 'accent' : 'neutral'} />
-          <Tag label={cat.name} />
-          {item.status !== 'active' ? <Tag label={item.status === 'vendue' ? 'Vendue' : 'Retirée'} tone="accent" /> : null}
+          <Tag label={tr(cat.name)} />
+          {item.status !== 'active' ? <Tag label={item.status === 'vendue' ? tr('Vendue') : tr('Retirée')} tone="accent" /> : null}
         </View>
         <H1 style={{ fontSize: 26 }}>{item.title}</H1>
         <Text style={{ fontSize: 28, fontWeight: '800', color: t.text }}>
-          {money(item.price_cents)} <Text style={{ fontSize: 14, color: t.muted, fontWeight: '500' }}>{item.price_unit}</Text>
+          {money(item.price_cents)} <Text style={{ fontSize: 14, color: t.muted, fontWeight: '500' }}>{tr(item.price_unit)}</Text>
         </Text>
         <View style={[styles.facts, { borderColor: t.line }]}>
           {facts.map(([k, v]) => (
@@ -128,9 +130,9 @@ export default function ListingScreen() {
           ))}
         </View>
         {mine ? (
-          <Notice icon="person-outline">C’est votre annonce. Gérez-la dans l’onglet Compte.</Notice>
+          <Notice icon="person-outline">{tr('C’est votre annonce. Gérez-la dans l’onglet Compte.')}</Notice>
         ) : (
-          <Button label="Contacter le vendeur" icon="chatbubble-outline" loading={busy} onPress={contact} disabled={item.status !== 'active'} />
+          <Button label={tr('Contacter le vendeur')} icon="chatbubble-outline" loading={busy} onPress={contact} disabled={item.status !== 'active'} />
         )}
         {error ? <P style={{ color: t.danger }}>{error}</P> : null}
         <View style={{ flexDirection: 'row', gap: space.sm }}>
@@ -138,15 +140,15 @@ export default function ListingScreen() {
             style={{ flex: 1 }}
             kind="secondary"
             icon={favorites.ids.has(item.id) ? 'heart' : 'heart-outline'}
-            label={favorites.ids.has(item.id) ? 'Sauvegardée' : 'Sauvegarder'}
+            label={favorites.ids.has(item.id) ? tr('Sauvegardée') : tr('Sauvegarder')}
             onPress={() => favorites.toggle(item.id)}
           />
           <Button
             style={{ flex: 1 }}
             kind="secondary"
             icon="share-outline"
-            label="Partager"
-            onPress={() => Share.share({ message: `${item.title} · ${money(item.price_cents)} sur Bâtiplace` }).catch(() => {})}
+            label={tr('Partager')}
+            onPress={() => Share.share({ message: tr('{title} · {price} sur Bâtiplace', { title: item.title, price: money(item.price_cents) }) }).catch(() => {})}
           />
         </View>
       </Card>
@@ -157,7 +159,7 @@ export default function ListingScreen() {
             <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
               <Avatar name={item.seller.display_name} uri={item.seller.avatar_url} />
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={{ color: t.text, fontWeight: '700' }}>{item.seller.display_name || 'Membre Bâtiplace'}</Text>
+                <Text style={{ color: t.text, fontWeight: '700' }}>{item.seller.display_name || tr('Membre Bâtiplace')}</Text>
                 <Text style={{ color: t.muted, fontSize: 13 }}>
                   {sellerTypeLabel(item.seller.seller_type)}
                   {item.seller.city ? ` · ${item.seller.city}` : ''}
@@ -168,10 +170,10 @@ export default function ListingScreen() {
                     <Text style={{ color: t.muted, fontSize: 12 }}>({rating.count})</Text>
                   </View>
                 ) : (
-                  <Text style={{ color: t.muted, fontSize: 12 }}>Nouveau vendeur</Text>
+                  <Text style={{ color: t.muted, fontSize: 12 }}>{tr('Nouveau vendeur')}</Text>
                 )}
                 {item.seller.rbq_verified && item.seller.rbq_license ? (
-                  <Text style={{ color: t.ok, fontSize: 12, fontWeight: '600' }}>Licence RBQ {item.seller.rbq_license} vérifiée</Text>
+                  <Text style={{ color: t.ok, fontSize: 12, fontWeight: '600' }}>{tr('Licence RBQ {n} vérifiée', { n: item.seller.rbq_license })}</Text>
                 ) : null}
               </View>
               <Icon name="chevron-forward" color={t.muted} />
@@ -181,7 +183,7 @@ export default function ListingScreen() {
       ) : null}
 
       <Notice icon="shield-checkmark-outline" tone="ok">
-        Aucune commission Bâtiplace. Vous payez le vendeur directement. Inspectez l’article avant de payer.
+        {tr('Aucune commission Bâtiplace. Vous payez le vendeur directement. Inspectez l’article avant de payer.')}
       </Notice>
     </View>
   );
@@ -194,8 +196,8 @@ export default function ListingScreen() {
           {gallery}
           {!wide ? summary : null}
           <Card>
-            <Text style={{ color: t.text, fontWeight: '700', fontSize: 18 }}>Description</Text>
-            <P>{item.description || 'Aucune description.'}</P>
+            <Text style={{ color: t.text, fontWeight: '700', fontSize: 18 }}>{tr('Description')}</Text>
+            <P>{item.description || tr('Aucune description.')}</P>
           </Card>
         </View>
         {wide ? <View style={{ flex: 1 }}>{summary}</View> : null}

@@ -7,6 +7,7 @@ import { RequireAuth } from '@/components/require-auth';
 import { Empty, H1, Loading, P, Screen } from '@/components/ui';
 import type { SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
+import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { supabase } from '@/lib/supabase';
 import { space } from '@/lib/theme';
@@ -15,14 +16,16 @@ type FavListing = Pick<SearchResult, 'id' | 'title' | 'price_cents' | 'price_uni
 
 export default function FavoritesScreen() {
   useSeo({ title: 'Favoris', noindex: true });
+  const { tr } = useI18n();
   return (
-    <RequireAuth title="Favoris" reason="Sauvegardez des annonces pour les retrouver ici, sur le Web comme dans l’application.">
+    <RequireAuth title={tr('Favoris')} reason={tr('Sauvegardez des annonces pour les retrouver ici, sur le Web comme dans l’application.')}>
       <FavoritesList />
     </RequireAuth>
   );
 }
 
 function FavoritesList() {
+  const { tr } = useI18n();
   const { width } = useWindowDimensions();
   const favorites = useFavorites();
   const [items, setItems] = useState<FavListing[] | null>(null);
@@ -55,14 +58,14 @@ function FavoritesList() {
 
   return (
     <Screen>
-      <H1>Favoris</H1>
+      <H1>{tr('Favoris')}</H1>
       {items === null ? (
         <Loading />
       ) : visible.length === 0 ? (
-        <Empty title="Aucun favori pour l’instant" body="Touchez le cœur d’une annonce pour la retrouver ici." />
+        <Empty title={tr('Aucun favori pour l’instant')} body={tr('Touchez le cœur d’une annonce pour la retrouver ici.')} />
       ) : (
         <>
-          <P muted>{visible.length} annonce{visible.length > 1 ? 's' : ''} sauvegardée{visible.length > 1 ? 's' : ''}</P>
+          <P muted>{tr(visible.length > 1 ? '{n} annonces sauvegardées' : '{n} annonce sauvegardée', { n: visible.length })}</P>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
             {visible.map((l) => (
               <View key={l.id} style={{ width: `${100 / columns - 3}%`, flexGrow: 1 }}>
