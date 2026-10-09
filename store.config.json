@@ -1,0 +1,20 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "copyright": "2026 Bâtiplace",
+    "categories": ["SHOPPING", "LIFESTYLE"],
+    "release": { "automaticRelease": false },
+    "info": {
+      "fr-CA": {
+        "title": "Bâtiplace",
+        "subtitle": "Matériaux et outils au Québec",
+        "promoText": "Publication gratuite, zéro commission. Achetez et vendez matériaux, outils et équipements près de chez vous, partout au Québec.",
+        "description": "Bâtiplace, c'est le marketplace de la construction au Québec.\n\nAchetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.\n\n• Trouvez près de chez vous : céramique, gypse, bois, portes et fenêtres, plomberie, électricité, outils, machinerie et surplus de chantier.\n• Cherchez par ville et par distance, de 10 km à tout le Québec.\n• Publiez une annonce en quelques secondes avec vos photos.\n• Discutez directement avec le vendeur dans l'application.\n• Gardez vos trouvailles en favoris.\n• Consultez les profils et les évaluations des vendeurs, et repérez les professionnels avec licence RBQ.\n• Trouvez un entrepreneur partenaire pour vos travaux.\n\nLe surplus des uns, le chantier des autres : donnez une deuxième vie aux matériaux et économisez sur vos projets.\n\nGratuit : 5 annonces actives. Bâtiplace Illimité : annonces illimitées, rabais exclusifs chez nos partenaires, abonnement mensuel renouvelé automatiquement, annulable en tout temps dans les réglages de votre compte Apple.",
+        "keywords": ["construction", "matériaux", "outils", "rénovation", "surplus", "chantier", "bois", "quincaillerie", "usagé", "Québec", "RBQ"],
+        "marketingUrl": "https://www.batiplace.ca",
+        "supportUrl": "https://www.batiplace.ca",
+        "privacyPolicyUrl": "https://www.batiplace.ca/confidentialite"
+      }
+    }
+  }
+}
