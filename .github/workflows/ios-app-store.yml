@@ -1,0 +1,55 @@
+# Construit l'app iPhone avec EAS et l'envoie à App Store Connect (TestFlight).
+# Lancement manuel : GitHub > Actions > « App iPhone » > Run workflow.
+#
+# Secrets du dépôt (Settings > Secrets and variables > Actions) :
+#   EXPO_TOKEN     jeton d'accès expo.dev (Account settings > Access tokens)
+#   ASC_KEY_ID     ID de la clé API App Store Connect
+#   ASC_ISSUER_ID  Issuer ID de la clé API App Store Connect
+#   ASC_KEY_P8     contenu du fichier AuthKey_XXXX.p8
+#   APPLE_TEAM_ID  Team ID Apple (developer.apple.com > Membership)
+# Variable du dépôt (onglet Variables) :
+#   ASC_APP_ID     numéro « Apple ID » de l'app dans App Store Connect (pour l'envoi)
+name: App iPhone
+
+on:
+  workflow_dispatch:
+    inputs:
+      submit:
+        description: Envoyer le build à App Store Connect (TestFlight)
+        type: boolean
+        default: true
+
+jobs:
+  ios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EXPO_ASC_API_KEY_PATH: ${{ github.workspace }}/asc-key.p8
+      EXPO_ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      EXPO_ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      EXPO_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Clé API App Store Connect
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: printf '%s\n' "$ASC_KEY_P8" > asc-key.p8
+      - name: Lier le projet à expo.dev
+        run: npx eas-cli@latest init --non-interactive --force
+      - name: Construire l'app iPhone
+        run: npx eas-cli@latest build --platform ios --profile production --non-interactive --wait
+      - name: Envoyer à App Store Connect
+        if: ${{ inputs.submit && vars.ASC_APP_ID != '' }}
+        run: |
+          jq --arg id "${{ vars.ASC_APP_ID }}" --arg key "$EXPO_ASC_API_KEY_PATH" --arg kid "$EXPO_ASC_KEY_ID" --arg iss "$EXPO_ASC_ISSUER_ID" \
+            '.submit.production.ios = {ascAppId: $id, ascApiKeyPath: $key, ascApiKeyId: $kid, ascApiKeyIssuerId: $iss}' eas.json > eas.tmp && mv eas.tmp eas.json
+          npx eas-cli@latest submit --platform ios --profile production --latest --non-interactive --wait
+      - name: Nettoyer la clé
+        if: always()
+        run: rm -f asc-key.p8

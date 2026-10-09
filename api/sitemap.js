@@ -6,6 +6,7 @@ const STATIC_PAGES = [
   ['/entrepreneurs', 'weekly', '0.8'],
   ['/publier', 'monthly', '0.8'],
   ['/partenaires', 'weekly', '0.6'],
+  ['/confidentialite', 'yearly', '0.2'],
   ['/abonnement', 'monthly', '0.5'],
 ];
 
