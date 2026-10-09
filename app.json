@@ -59,6 +59,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "owner": "lokalogement",
+    "extra": {
+      "eas": {
+        "projectId": "3dcdecb0-29f6-443a-89c6-c3a412b7354d"
+      }
     }
   }
 }
