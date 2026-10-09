@@ -11,7 +11,7 @@ import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
 // promo_code is not readable by the public; it comes from partner_promo_code() for subscribers.
-const PARTNER_COLUMNS = 'id, name, offer, description, category, city, address, website, logo_url, active, sort_order, created_at';
+const PARTNER_COLUMNS = 'id, name, offer, description, category, city, address, website, phone, email, logo_url, active, sort_order, created_at';
 
 export default function PartnersScreen() {
   useSeo({ title: 'Partenaires : rabais exclusifs pour les abonnés', description: 'Rabais exclusifs chez des quincailleries, fournisseurs et commerces du Québec pour les abonnés Bâtiplace et LOKA.', path: '/partenaires' });
@@ -138,6 +138,10 @@ function PartnerCard({ partner: p }: { partner: Partner }) {
             onPress={() => router.push(userId ? '/abonnement' : '/connexion')}
           />
         )}
+        {p.phone ? (
+          <Button kind="secondary" icon="call-outline" label={p.phone} onPress={() => Linking.openURL(`tel:${p.phone.replace(/[^\d+]/g, '')}`)} />
+        ) : null}
+        {p.email ? <Button kind="secondary" icon="mail-outline" label={p.email} onPress={() => Linking.openURL(`mailto:${p.email}`)} /> : null}
         {website ? <Button kind="secondary" icon="open-outline" label="Site Web" onPress={() => Linking.openURL(website)} /> : null}
       </View>
     </Card>

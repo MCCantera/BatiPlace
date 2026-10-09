@@ -135,6 +135,8 @@ export type Partner = {
   city: string;
   address: string;
   website: string;
+  phone: string;
+  email: string;
   logo_url: string;
   active: boolean;
   sort_order: number;
