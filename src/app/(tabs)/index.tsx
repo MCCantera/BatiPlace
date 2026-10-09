@@ -110,6 +110,18 @@ export default function ExploreScreen() {
         </Pressable>
       </View>
 
+      <Pressable
+        accessibilityRole="link"
+        onPress={() => router.push('/entrepreneurs')}
+        style={({ pressed }) => [styles.contractors, { backgroundColor: t.brand }, pressed && { opacity: 0.9 }]}>
+        <Icon name="construct-outline" size={26} color={t.brandText} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={{ color: t.brandText, fontWeight: '800', fontSize: 17 }}>Vous cherchez un entrepreneur ?</Text>
+          <Text style={{ color: t.brandText, opacity: 0.85 }}>Trouvez un pro près de chez vous pour vos travaux.</Text>
+        </View>
+        <Icon name="chevron-forward" color={t.brandText} />
+      </Pressable>
+
       <View style={[styles.search, { backgroundColor: t.surface, borderColor: t.line }]}>
         <Icon name="search" color={t.muted} />
         <TextInput
@@ -256,6 +268,7 @@ const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   mark: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
   hero: { borderRadius: radius.lg, padding: space.lg, gap: space.sm },
+  contractors: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderRadius: radius.lg, paddingHorizontal: space.lg, paddingVertical: space.md },
   partners: { flexDirection: 'row', alignItems: 'center', gap: space.sm, alignSelf: 'flex-start', borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, marginTop: space.xs },
   search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingLeft: space.lg, paddingRight: 5, paddingVertical: 5 },
   searchBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 9 },
