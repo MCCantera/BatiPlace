@@ -13,7 +13,7 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Bâtiplace utilise votre position pour afficher les annonces près de chez vous.",
-        "NSPhotoLibraryUsageDescription": "Bâtiplace accède à vos photos pour illustrer vos annonces.",
+        "NSPhotoLibraryUsageDescription": "Bâtiplace accède à vos photos pour illustrer vos annonces et votre profil.",
         "NSCameraUsageDescription": "Bâtiplace utilise l’appareil photo pour photographier les articles que vous vendez.",
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -45,7 +45,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Bâtiplace accède à vos photos pour illustrer vos annonces.",
+          "photosPermission": "Bâtiplace accède à vos photos pour illustrer vos annonces et votre profil.",
           "cameraPermission": "Bâtiplace utilise l’appareil photo pour photographier les articles que vous vendez."
         }
       ],

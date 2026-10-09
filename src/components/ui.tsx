@@ -242,8 +242,11 @@ export function ListingImage({
   );
 }
 
-export function Avatar({ name, size = 44, color }: { name: string; size?: number; color?: string }) {
+export function Avatar({ name, size = 44, color, uri }: { name: string; size?: number; color?: string; uri?: string | null }) {
   const t = useTheme();
+  if (uri) {
+    return <Image source={{ uri }} contentFit="cover" accessibilityLabel={name} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: t.surface2 }} />;
+  }
   const initials =
     name
       .split(/[\s-]+/)

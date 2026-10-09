@@ -74,7 +74,7 @@ function Inbox() {
             return (
               <Link key={c.id} href={{ pathname: '/conversation/[id]', params: { id: c.id } }} asChild>
                 <Pressable style={[styles.row, { borderColor: t.line }]}>
-                  <Avatar name={other?.display_name ?? '?'} />
+                  <Avatar name={other?.display_name ?? '?'} uri={other?.avatar_url} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.sm }}>
                       <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flex: 1 }}>

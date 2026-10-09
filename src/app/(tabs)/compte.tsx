@@ -61,7 +61,7 @@ function Account() {
   return (
     <Screen>
       <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg, flexWrap: 'wrap' }}>
-        <Avatar name={name} size={64} />
+        <Avatar name={name} uri={profile?.avatar_url} size={64} />
         <View style={{ flex: 1, minWidth: 180, gap: 4 }}>
           <H1 style={{ fontSize: 24 }}>{name}</H1>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>

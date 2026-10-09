@@ -89,7 +89,7 @@ export default function SellerScreen() {
     <Screen edges={[]}>
       <Stack.Screen options={{ title: profile.display_name || 'Vendeur' }} />
       <Card style={{ flexDirection: 'row', gap: space.lg, alignItems: 'center', flexWrap: 'wrap' }}>
-        <Avatar name={profile.display_name} size={72} />
+        <Avatar name={profile.display_name} uri={profile.avatar_url} size={72} />
         <View style={{ flex: 1, minWidth: 200, gap: 4 }}>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             <Tag label={sellerTypeLabel(profile.seller_type)} tone={profile.seller_type === 'particulier' ? 'neutral' : 'brand'} />

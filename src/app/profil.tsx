@@ -1,14 +1,15 @@
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
-import { Button, Card, Chip, Field, H2, Notice, P, Screen } from '@/components/ui';
+import { Avatar, Button, Card, Chip, Field, H2, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { CityField } from '@/components/city-field';
 import { SELLER_TYPES } from '@/lib/catalog';
 import type { SellerType } from '@/lib/database.types';
 import { useSeo } from '@/lib/seo';
-import { friendlyError, supabase } from '@/lib/supabase';
+import { PHOTO_BUCKET, friendlyError, photoUrl, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
 
 export default function ProfileScreen() {
@@ -23,6 +24,7 @@ export default function ProfileScreen() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -48,6 +50,42 @@ export default function ProfileScreen() {
     setMessage('Profil enregistré.');
   }
 
+  /** Uploads the photo right away (in the user's own storage folder) and saves its URL on the profile. */
+  async function setPhoto(asset: ImagePicker.ImagePickerAsset | null) {
+    setPhotoBusy(true);
+    setError('');
+    setMessage('');
+    let avatarUrl: string | null = null;
+    if (asset) {
+      const contentType = asset.mimeType ?? 'image/jpeg';
+      const path = `${userId}/avatar/${Date.now()}.${contentType.split('/')[1] ?? 'jpg'}`;
+      const body = await (await fetch(asset.uri)).arrayBuffer();
+      const { error: upErr } = await supabase.storage.from(PHOTO_BUCKET).upload(path, body, { contentType });
+      if (upErr) {
+        setPhotoBusy(false);
+        return setError('La photo n’a pas pu être envoyée. Essayez une image JPEG ou PNG de moins de 8 Mo.');
+      }
+      avatarUrl = photoUrl(path);
+    }
+    const { error: err } = await supabase.from('profiles').update({ avatar_url: avatarUrl }).eq('id', userId!);
+    if (err) {
+      setPhotoBusy(false);
+      return setError(friendlyError(err));
+    }
+    // Remove the previous photo from storage.
+    const marker = `/${PHOTO_BUCKET}/`;
+    const old = profile?.avatar_url;
+    if (old?.includes(marker)) await supabase.storage.from(PHOTO_BUCKET).remove([old.slice(old.indexOf(marker) + marker.length)]);
+    await refresh();
+    setPhotoBusy(false);
+    setMessage(asset ? 'Photo de profil enregistrée.' : 'Photo de profil retirée.');
+  }
+
+  async function pickPhoto() {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.6 });
+    if (!res.canceled && res.assets[0]) await setPhoto(res.assets[0]);
+  }
+
   async function deleteAccount() {
     setBusy(true);
     const { error: err } = await supabase.functions.invoke('delete-account', { method: 'POST' });
@@ -60,6 +98,15 @@ export default function ProfileScreen() {
   return (
     <Screen edges={[]}>
       <Card style={{ gap: space.lg }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, flexWrap: 'wrap' }}>
+          <Avatar name={name || 'Membre'} uri={profile?.avatar_url} size={80} />
+          <View style={{ flex: 1, minWidth: 180, gap: space.sm }}>
+            <Button kind="secondary" icon="camera-outline" label={profile?.avatar_url ? 'Changer la photo' : 'Ajouter une photo'} loading={photoBusy} onPress={pickPhoto} />
+            {profile?.avatar_url && !photoBusy ? (
+              <Button kind="secondary" icon="trash-outline" label="Retirer la photo" onPress={() => setPhoto(null)} />
+            ) : null}
+          </View>
+        </View>
         <Field label="Nom affiché" value={name} onChangeText={setName} maxLength={80} />
         <View style={{ gap: space.sm }}>
           <Text style={{ color: t.text, fontWeight: '600' }}>Je vends en tant que</Text>

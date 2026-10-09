@@ -12,7 +12,7 @@ import { friendlyError, photoUrl, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
 type Detail = Listing & {
-  seller: Pick<Profile, 'id' | 'display_name' | 'seller_type' | 'city' | 'rbq_license' | 'rbq_verified'> | null;
+  seller: Pick<Profile, 'id' | 'display_name' | 'seller_type' | 'city' | 'rbq_license' | 'rbq_verified' | 'avatar_url'> | null;
   listing_photos: { path: string; position: number }[];
 };
 
@@ -32,7 +32,7 @@ export default function ListingScreen() {
     if (!id) return;
     supabase
       .from('listings')
-      .select('*, seller:profiles(id, display_name, seller_type, city, rbq_license, rbq_verified), listing_photos(path, position)')
+      .select('*, seller:profiles(id, display_name, seller_type, city, rbq_license, rbq_verified, avatar_url), listing_photos(path, position)')
       .eq('id', id)
       .maybeSingle()
       .then(async ({ data }) => {
@@ -155,7 +155,7 @@ export default function ListingScreen() {
         <Link href={{ pathname: '/vendeur/[id]', params: { id: item.seller.id } }} asChild>
           <Pressable>
             <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-              <Avatar name={item.seller.display_name} />
+              <Avatar name={item.seller.display_name} uri={item.seller.avatar_url} />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={{ color: t.text, fontWeight: '700' }}>{item.seller.display_name || 'Membre Bâtiplace'}</Text>
                 <Text style={{ color: t.muted, fontSize: 13 }}>
