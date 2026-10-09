@@ -152,6 +152,7 @@ export type Contractor = {
   rbq_license: string;
   specialties: string;
   website: string;
+  logo_url: string;
   approved: boolean;
   rbq_verified: boolean;
   sort_order: number;

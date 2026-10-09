@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Linking, Pressable, Text, View, useWindowDimensions } from 'react-native';
@@ -7,10 +8,10 @@ import { Avatar, Button, Card, Empty, H1, Loading, Notice, P, Screen, Tag } from
 import type { Contractor } from '@/lib/database.types';
 import { useSeo } from '@/lib/seo';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
-import { space, useTheme } from '@/lib/theme';
+import { radius, space, useTheme } from '@/lib/theme';
 
 // Only public columns: contact name, email and message of a request stay private.
-const CONTRACTOR_COLUMNS = 'id, company_name, phone, city, rbq_license, specialties, website, approved, rbq_verified, sort_order, created_at';
+const CONTRACTOR_COLUMNS = 'id, company_name, phone, city, rbq_license, specialties, website, logo_url, approved, rbq_verified, sort_order, created_at';
 
 /** Contractors approved by Bâtiplace after a partnership request. */
 export default function ContractorsScreen() {
@@ -89,7 +90,11 @@ function ContractorCard({ contractor: c }: { contractor: Contractor }) {
   return (
     <Card style={{ gap: space.md, height: '100%' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
-        <Avatar name={c.company_name} size={52} />
+        {c.logo_url ? (
+          <Image source={{ uri: c.logo_url }} contentFit="contain" style={{ width: 52, height: 52, borderRadius: radius.md, backgroundColor: '#fff' }} />
+        ) : (
+          <Avatar name={c.company_name} size={52} />
+        )}
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={{ color: t.text, fontWeight: '800', fontSize: 17 }}>{c.company_name}</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
