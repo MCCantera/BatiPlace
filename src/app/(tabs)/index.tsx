@@ -6,11 +6,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CityField } from '@/components/city-field';
 import { ListingCard } from '@/components/listing-card';
 import { Button, Chip, Empty, Icon, Loading, P } from '@/components/ui';
-import { CATEGORIES, CITY_NAMES, CONDITIONS } from '@/lib/catalog';
+import { CATEGORIES, CITY_NAMES, CONDITIONS, category, conditionLabel, money } from '@/lib/catalog';
 import type { ListingCondition, SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
 import { useOrigin } from '@/lib/location';
 import { useSeo } from '@/lib/seo';
+import { parseSmartQuery, type SmartQuery } from '@/lib/smart-search';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
 
@@ -48,8 +49,29 @@ export default function ExploreScreen() {
   const [results, setResults] = useState<SearchResult[] | null>(null);
   const [error, setError] = useState('');
   const [picker, setPicker] = useState(false);
+  const [smart, setSmart] = useState<SmartQuery | null>(null);
+  const [fallback, setFallback] = useState(false);
 
-  const runSearch = () => setQuery(q.trim());
+  // Search assistant: understands « je cherche de la céramique neuve à Laval » and sets the filters.
+  const runSearch = () => {
+    const text = q.trim();
+    if (!text) return clearSearch();
+    const parsed = parseSmartQuery(text);
+    setSmart(parsed);
+    if (parsed.city) setCity(parsed.city);
+    // Filters set by the previous sentence are replaced; ones picked by hand stay.
+    if (parsed.condition) setConds([parsed.condition]);
+    else if (smart?.condition) setConds([]);
+    if (parsed.proOnly !== undefined) setProOnly(parsed.proOnly);
+    else if (smart?.proOnly !== undefined) setProOnly(null);
+    setQuery(parsed.keywords.join(' '));
+  };
+
+  const clearSearch = () => {
+    setQ('');
+    setQuery('');
+    setSmart(null);
+  };
 
   const load = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -57,7 +79,7 @@ export default function ExploreScreen() {
       return;
     }
     setError('');
-    const { data, error: err } = await supabase.rpc('search_listings', {
+    const args = {
       lat: origin.lat,
       lng: origin.lng,
       radius_km: radiusKm,
@@ -66,10 +88,17 @@ export default function ExploreScreen() {
       conditions: conds.length ? conds : null,
       pro_only: proOnly,
       sort,
-    });
+    };
+    let { data, error: err } = await supabase.rpc('search_listings', args);
+    // No listing mentions the words: show the matching categories instead (« céramique » → Revêtements).
+    const fallbackCats = smart && query && !cats.length ? smart.categories : [];
+    const useFallback = !err && !data?.length && fallbackCats.length > 0;
+    if (useFallback) ({ data, error: err } = await supabase.rpc('search_listings', { ...args, q: null, categories: fallbackCats }));
     if (err) setError('Impossible de charger les annonces. Vérifiez votre connexion.');
-    setResults(data ?? []);
-  }, [origin, radiusKm, query, cats, conds, proOnly, sort]);
+    const max = smart?.maxPriceCents;
+    setFallback(useFallback);
+    setResults((data ?? []).filter((l) => !max || l.price_cents <= max));
+  }, [origin, radiusKm, query, cats, conds, proOnly, sort, smart]);
 
   useEffect(() => {
     load();
@@ -125,15 +154,15 @@ export default function ExploreScreen() {
       </Pressable>
 
       <View style={[styles.search, { backgroundColor: t.surface, borderColor: t.line }]}>
-        <Icon name="search" color={t.muted} />
+        <Icon name="sparkles" color={t.accent} />
         <TextInput
           value={q}
           onChangeText={(v) => {
             setQ(v);
-            if (!v.trim()) setQuery('');
+            if (!v.trim()) clearSearch();
           }}
           onSubmitEditing={runSearch}
-          placeholder="Céramique, gypse, scie à onglet…"
+          placeholder="Ex. : je cherche de la céramique à Laval"
           placeholderTextColor={t.muted}
           style={{ flex: 1, minWidth: 0, fontSize: 16, color: t.text, paddingVertical: 8 }}
           returnKeyType="search"
@@ -147,6 +176,23 @@ export default function ExploreScreen() {
           <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 15 }}>Rechercher</Text>
         </Pressable>
       </View>
+
+      {smart ? (
+        <View style={[styles.assistant, { backgroundColor: t.surface2 }]}>
+          <Icon name="sparkles" size={18} color={t.accent} />
+          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+            <Text style={{ color: t.text, fontWeight: '600' }}>{assistantSummary(smart, origin.label)}</Text>
+            {fallback ? (
+              <Text style={{ color: t.muted, fontSize: 13 }}>
+                {`Aucune annonce ne mentionne « ${smart.keywords.join(' ')} » pour l’instant. Voici les annonces de ${smart.categories.map((c) => category(c).name).join(', ')}.`}
+              </Text>
+            ) : null}
+          </View>
+          <Pressable accessibilityRole="button" accessibilityLabel="Effacer la recherche" onPress={clearSearch} hitSlop={8}>
+            <Icon name="close" size={18} color={t.muted} />
+          </Pressable>
+        </View>
+      ) : null}
 
       <View style={styles.row}>
         <Pressable onPress={() => setPicker(true)} style={[styles.locBtn, { borderColor: t.line, backgroundColor: t.surface }]}>
@@ -266,6 +312,15 @@ export default function ExploreScreen() {
   );
 }
 
+function assistantSummary(s: SmartQuery, place: string) {
+  const parts = [s.keywords.length ? `Je cherche « ${s.keywords.join(' ')} »` : 'Je cherche des annonces', `autour de ${place}`];
+  if (s.condition) parts.push(conditionLabel(s.condition).toLowerCase());
+  if (s.proOnly === true) parts.push('chez les professionnels');
+  if (s.proOnly === false) parts.push('chez les particuliers');
+  if (s.maxPriceCents) parts.push(`${money(s.maxPriceCents)} maximum`);
+  return parts.join(', ') + '.';
+}
+
 const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   mark: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
@@ -275,6 +330,7 @@ const styles = StyleSheet.create({
   search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingLeft: space.lg, paddingRight: 5, paddingVertical: 5 },
   searchBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 9 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  assistant: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm, borderRadius: radius.md, padding: space.md },
   locBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: space.lg },
   sheet: { borderRadius: radius.lg, padding: space.lg, gap: space.md, width: '100%', maxWidth: 440, alignSelf: 'center' },

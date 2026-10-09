@@ -70,7 +70,7 @@ export const CITIES: Record<string, { lat: number; lng: number }> = {
   ...MAIN_CITIES,
 };
 
-const fold = (s: string) =>
+export const fold = (s: string) =>
   s
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
