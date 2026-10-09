@@ -3,6 +3,7 @@ const { SITE_URL, rest } = require('./_shared');
 
 const STATIC_PAGES = [
   ['/', 'daily', '1.0'],
+  ['/entrepreneurs', 'weekly', '0.8'],
   ['/publier', 'monthly', '0.8'],
   ['/partenaires', 'weekly', '0.6'],
   ['/abonnement', 'monthly', '0.5'],

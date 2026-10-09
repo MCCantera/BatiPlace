@@ -6,6 +6,7 @@ import { CityField } from '@/components/city-field';
 import { Avatar, Button, Card, Empty, H1, Icon, Loading, Notice, P, Screen, Stars, Tag } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import type { Profile } from '@/lib/database.types';
+import { useSeo } from '@/lib/seo';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
 
@@ -13,6 +14,7 @@ type Rating = { seller_id: string; average: number; count: number };
 
 /** Directory of sellers whose profile says they are contractors. */
 export default function ContractorsScreen() {
+  useSeo({ title: 'Trouver un entrepreneur en construction au Québec', description: 'Annuaire des entrepreneurs et professionnels de la construction inscrits sur Bâtiplace, avec licence RBQ et évaluations, partout au Québec.', path: '/entrepreneurs' });
   const t = useTheme();
   const { width } = useWindowDimensions();
   const { userId } = useAuth();
