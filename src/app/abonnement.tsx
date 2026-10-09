@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Linking, Platform, Text, View } from 'react-native';
 
 import { Button, Card, H1, Icon, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
@@ -8,6 +8,9 @@ import { FREE_LISTING_LIMIT, SUBSCRIPTION_PRICE } from '@/lib/catalog';
 import { buySubscription, purchasesAvailable, restorePurchases, storeName } from '@/lib/purchases';
 import { useSeo } from '@/lib/seo';
 import { space, useTheme } from '@/lib/theme';
+
+// Apple's standard licence agreement, required next to an auto-renewable subscription.
+const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 
 const PERKS = [
   'Annonces illimitées',
@@ -85,6 +88,14 @@ export default function SubscriptionScreen() {
           <P muted style={{ fontSize: 12 }}>
             Abonnement mensuel renouvelé automatiquement, facturé à votre compte {storeName}. Annulable en tout temps dans les réglages de votre téléphone, au moins 24 h avant la fin de la période en cours.
           </P>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
+            <Text onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
+              Conditions d’utilisation
+            </Text>
+            <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
+              Politique de confidentialité
+            </Text>
+          </View>
         </View>
       )}
       {message ? <Notice>{message}</Notice> : null}
