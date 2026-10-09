@@ -54,3 +54,7 @@ Liste des villes du Québec (`src/lib/quebec-places.ts`) : GeoNames (CC BY 4.0, 
 ## Partenaires
 
 Page `/partenaires` : rabais exclusifs pour les abonnés Bâtiplace Illimité et LOKA. Pour ajouter un marchand : Supabase, Table Editor, table `partners`, Insert row. Champs obligatoires : `name`, `offer` (ex. « 15 % sur la quincaillerie »). Facultatifs : `description`, `category`, `city`, `address`, `website`, `logo_url`, `promo_code` (montré seulement aux abonnés Bâtiplace connectés), `sort_order` (ordre d'affichage), `active` (décocher pour masquer).
+
+## Entrepreneurs partenaires
+
+Page `/entrepreneurs` : seuls les entrepreneurs approuvés y apparaissent. Ils envoient une demande par `/devenir-partenaire`, qui arrive dans la table `contractor_requests` de Supabase (Table Editor). Pour afficher une entreprise : cocher `approved` (et `rbq_verified` après vérification de la licence sur le site de la RBQ). Le nom du contact, le courriel et le message ne sont jamais publics ; le téléphone, la ville, les spécialités, la licence et le site Web sont affichés une fois approuvée.

@@ -141,6 +141,33 @@ export type Partner = {
   created_at: string;
 };
 
+/** Public columns of an approved contractor (contact_name, email and message stay private). */
+export type Contractor = {
+  id: string;
+  company_name: string;
+  phone: string;
+  city: string;
+  rbq_license: string;
+  specialties: string;
+  website: string;
+  approved: boolean;
+  rbq_verified: boolean;
+  sort_order: number;
+  created_at: string;
+};
+
+export type ContractorRequest = {
+  company_name: string;
+  contact_name: string;
+  email: string;
+  phone?: string;
+  city?: string;
+  rbq_license?: string;
+  specialties?: string;
+  website?: string;
+  message?: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -154,6 +181,7 @@ export type Database = {
       messages: Table<Message, { conversation_id: string; body: string; sender_id?: string }, { read_at?: string | null }>;
       reviews: Table<Review, { seller_id: string; rating: number; body?: string; author_id?: string }>;
       partners: Table<Partner>;
+      contractor_requests: Table<Contractor, ContractorRequest, never>;
     };
     Views: {
       seller_ratings: {

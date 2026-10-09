@@ -36,6 +36,7 @@ function Navigator() {
       <Stack.Screen name="profil" options={{ title: 'Mon profil' }} />
       <Stack.Screen name="partenaires" options={{ title: 'Partenaires' }} />
       <Stack.Screen name="entrepreneurs" options={{ title: 'Entrepreneurs' }} />
+      <Stack.Screen name="devenir-partenaire" options={{ title: 'Devenir partenaire' }} />
     </Stack>
   );
 }
