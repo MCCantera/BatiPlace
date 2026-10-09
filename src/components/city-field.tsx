@@ -57,7 +57,9 @@ export function CityField({
           onChangeText={(v) => {
             setText(v);
             setPicked(false);
+            // Clearing the field also clears a city picked from the list.
             if (!pickOnly) onChange(findCity(v) ?? '');
+            else if (!v.trim() && value) onChange('');
           }}
           onFocus={() => setFocused(true)}
           // Leave time for a tap on a suggestion before the list disappears.
