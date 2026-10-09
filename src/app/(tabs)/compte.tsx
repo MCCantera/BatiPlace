@@ -90,7 +90,7 @@ function Account() {
       {listings === null ? (
         <Loading />
       ) : listings.length === 0 ? (
-        <Empty title="Aucune annonce" body="Votre première annonce est gratuite." action={<Button label="Publier" icon="add" onPress={() => router.push('/publier')} />} />
+        <Empty title="Aucune annonce" body={`Vos ${FREE_LISTING_LIMIT} premières annonces sont gratuites.`} action={<Button label="Publier" icon="add" onPress={() => router.push('/publier')} />} />
       ) : (
         <View style={{ gap: space.sm }}>
           {listings.map((l) => {
