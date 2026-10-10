@@ -4,6 +4,7 @@
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/annonce/:id", "destination": "/api/annonce?id=:id" },
+    { "source": "/partenaires/:slug", "destination": "/api/partenaire?slug=:slug" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

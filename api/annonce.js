@@ -1,14 +1,10 @@
 // Serves /annonce/:id with the listing's title, description, photo and schema.org data already in the HTML,
 // so Google and link previews (Facebook, Messenger, texto) see the listing without running the app.
 // Keep in sync with listingSeo() in src/lib/seo-shared.ts.
-const { SITE_URL, rest, photoUrl, escapeHtml } = require('./_shared');
+const { SITE_URL, rest, photoUrl, escapeHtml, setTag } = require('./_shared');
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CONDITION_WORD = { neuf: 'neuf', usage: 'usagé', surplus: 'surplus de chantier' };
-
-function setTag(html, pattern, tag) {
-  return pattern.test(html) ? html.replace(pattern, tag) : html.replace('</head>', `    ${tag}\n  </head>`);
-}
 
 function inject(html, l) {
   const url = `${SITE_URL}/annonce/${l.id}`;

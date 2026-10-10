@@ -1,5 +1,5 @@
 // /sitemap.xml: the public pages plus every active listing and the sellers who have one, read live from Supabase.
-const { SITE_URL, rest } = require('./_shared');
+const { SITE_URL, rest, slugify } = require('./_shared');
 
 const STATIC_PAGES = [
   ['/', 'daily', '1.0'],
@@ -22,6 +22,12 @@ module.exports = async (_req, res) => {
     for (const [id, lastmod] of sellers) urls.push({ loc: `${SITE_URL}/vendeur/${id}`, lastmod, changefreq: 'weekly', priority: '0.4' });
   } catch {
     // Supabase unreachable: still serve the static pages.
+  }
+  try {
+    const partners = await rest('partners?active=eq.true&select=name,created_at');
+    for (const p of partners) urls.push({ loc: `${SITE_URL}/partenaires/${slugify(p.name)}`, lastmod: p.created_at, changefreq: 'monthly', priority: '0.7' });
+  } catch {
+    // Same: partner pages come back on the next read.
   }
   const body = urls
     .map(

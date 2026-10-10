@@ -19,6 +19,16 @@ export const SITE_NAME = 'Bâtiplace';
 export const DEFAULT_DESCRIPTION =
   'Le marketplace de la construction au Québec. Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels. Publication gratuite, zéro commission.';
 
+/** URL-friendly name: « Plomberie St-Henri » → plomberie-st-henri. api/_shared.js has the same function. */
+export function slugify(name: string) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 type ListingForSeo = {
   id: string;
   title: string;
@@ -61,6 +71,47 @@ export function listingSeo(l: ListingForSeo, categoryName: string, image: string
         areaServed: { '@type': 'City', name: l.city },
         url: `${SITE_URL}/annonce/${l.id}`,
       },
+    },
+  };
+}
+
+type PartnerForSeo = {
+  name: string;
+  offer: string;
+  description: string;
+  category: string;
+  city: string;
+  address: string;
+  website: string;
+  phone: string;
+  email: string;
+  logo_url: string;
+};
+
+/** Title, description and schema.org LocalBusiness for a partner page. api/partenaire.js mirrors this. */
+export function partnerSeo(p: PartnerForSeo): Seo {
+  const what = [p.category, p.city ? `à ${p.city}` : ''].filter(Boolean).join(' ');
+  const path = `/partenaires/${slugify(p.name)}`;
+  return {
+    title: `${p.name}${what ? ` : ${what}` : ''}, ${p.offer}`,
+    description: `${p.name}${what ? ` (${what})` : ''}. ${p.description} Partenaire Bâtiplace : ${p.offer} pour les abonnés.`,
+    path,
+    image: p.logo_url || null,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': /plomb/i.test(p.category) ? 'Plumber' : /[ée]lectri/i.test(p.category) ? 'Electrician' : 'LocalBusiness',
+      name: p.name,
+      description: p.description || undefined,
+      url: SITE_URL + path,
+      sameAs: p.website ? [p.website] : undefined,
+      logo: p.logo_url || undefined,
+      image: p.logo_url || undefined,
+      telephone: p.phone || undefined,
+      email: p.email || undefined,
+      address: p.city
+        ? { '@type': 'PostalAddress', streetAddress: p.address || undefined, addressLocality: p.city, addressRegion: 'QC', addressCountry: 'CA' }
+        : undefined,
+      areaServed: p.city || 'Québec',
     },
   };
 }

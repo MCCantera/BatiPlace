@@ -20,4 +20,18 @@ function escapeHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-module.exports = { SITE_URL, rest, photoUrl, escapeHtml };
+function setTag(html, pattern, tag) {
+  return pattern.test(html) ? html.replace(pattern, tag) : html.replace('</head>', `    ${tag}\n  </head>`);
+}
+
+// Same as slugify() in src/lib/seo-shared.ts.
+function slugify(name) {
+  return String(name)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+module.exports = { SITE_URL, rest, photoUrl, escapeHtml, setTag, slugify };

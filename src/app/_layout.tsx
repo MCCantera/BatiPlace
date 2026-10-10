@@ -37,6 +37,7 @@ function Navigator() {
       <Stack.Screen name="abonnement" options={{ title: tr('Bâtiplace Illimité'), presentation: 'modal' }} />
       <Stack.Screen name="profil" options={{ title: tr('Mon profil') }} />
       <Stack.Screen name="partenaires" options={{ title: tr('Partenaires') }} />
+      <Stack.Screen name="partenaires/[slug]" options={{ title: tr('Partenaire') }} />
       <Stack.Screen name="entrepreneurs" options={{ title: tr('Entrepreneurs') }} />
       <Stack.Screen name="devenir-partenaire" options={{ title: tr('Devenir partenaire') }} />
       <Stack.Screen name="confidentialite" options={{ title: tr('Confidentialité') }} />

@@ -92,6 +92,11 @@ const en: Record<string, string> = {
   'Vos droits': 'Your rights',
   'Conformément à la Loi 25 du Québec, vous pouvez demander l’accès à vos renseignements, leur correction ou leur suppression.':
     'Under Québec’s Law 25, you can request access to your information, its correction or its deletion.',
+  'Partenaire': 'Partner',
+  'Ce partenaire n’est plus disponible': 'This partner is no longer available',
+  '{name} est partenaire de Bâtiplace, le marketplace de la construction au Québec. Les abonnés Bâtiplace Illimité et LOKA profitent de : {offer}.':
+    '{name} is a Bâtiplace partner, the construction marketplace in Québec. Bâtiplace Unlimited and LOKA subscribers get: {offer}.',
+  'Voir tous les partenaires': 'See all partners',
   'Nous joindre': 'Contact us',
   'Responsable de la protection des renseignements personnels : ': 'Person in charge of the protection of personal information: ',
 };
