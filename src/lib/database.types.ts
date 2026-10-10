@@ -171,6 +171,16 @@ export type ContractorRequest = {
   message?: string;
 };
 
+export type ReportReason = 'fraude' | 'inapproprie' | 'interdit' | 'harcelement' | 'autre';
+export type ReportInsert = {
+  reason: ReportReason;
+  details?: string;
+  listing_id?: string | null;
+  reported_user_id?: string | null;
+  conversation_id?: string | null;
+};
+export type Block = { blocker_id: string; blocked_id: string; created_at: string };
+
 export type Database = {
   public: {
     Tables: {
@@ -185,6 +195,8 @@ export type Database = {
       reviews: Table<Review, { seller_id: string; rating: number; body?: string; author_id?: string }>;
       partners: Table<Partner>;
       contractor_requests: Table<Contractor, ContractorRequest, never>;
+      reports: Table<ReportInsert & { id: string }, ReportInsert, never>;
+      blocks: Table<Block, { blocked_id: string }, never>;
     };
     Views: {
       seller_ratings: {
@@ -211,6 +223,7 @@ export type Database = {
       increment_listing_view: { Args: { listing: string }; Returns: undefined };
       has_active_subscription: { Args: { uid: string }; Returns: boolean };
       partner_promo_code: { Args: { partner: string }; Returns: string | null };
+      is_blocked_between: { Args: { a: string; b: string }; Returns: boolean };
     };
     Enums: {
       seller_type: SellerType;

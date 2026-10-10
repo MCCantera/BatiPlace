@@ -40,6 +40,7 @@ function Navigator() {
       <Stack.Screen name="entrepreneurs" options={{ title: tr('Entrepreneurs') }} />
       <Stack.Screen name="devenir-partenaire" options={{ title: tr('Devenir partenaire') }} />
       <Stack.Screen name="confidentialite" options={{ title: tr('Confidentialité') }} />
+      <Stack.Screen name="conditions" options={{ title: tr('Conditions d’utilisation') }} />
     </Stack>
   );
 }

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { ListingCard } from '@/components/listing-card';
+import { ReportSheet } from '@/components/report-sheet';
 import { Avatar, Button, Card, Empty, Field, H1, H2, Icon, Loading, Notice, P, Screen, Stars, Tag } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { sellerTypeLabel } from '@/lib/catalog';
@@ -32,6 +33,7 @@ export default function SellerScreen() {
   const [body, setBody] = useState('');
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
+  const [reporting, setReporting] = useState(false);
 
   const loadReviews = useCallback(async () => {
     const { data } = await supabase
@@ -90,6 +92,9 @@ export default function SellerScreen() {
   return (
     <Screen edges={[]}>
       <Stack.Screen options={{ title: profile.display_name || tr('Vendeur') }} />
+      {userId && userId !== profile.id ? (
+        <ReportSheet visible={reporting} onClose={() => setReporting(false)} userId={profile.id} userName={profile.display_name} />
+      ) : null}
       <Card style={{ flexDirection: 'row', gap: space.lg, alignItems: 'center', flexWrap: 'wrap' }}>
         <Avatar name={profile.display_name} uri={profile.avatar_url} size={72} />
         <View style={{ flex: 1, minWidth: 200, gap: 4 }}>
@@ -160,6 +165,16 @@ export default function SellerScreen() {
         ) : null}
         {!userId ? <Button kind="secondary" label={tr('Se connecter pour évaluer')} onPress={() => router.push('/connexion')} /> : null}
       </Card>
+
+      {userId !== profile.id ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => (userId ? setReporting(true) : router.push('/connexion'))}
+          style={{ flexDirection: 'row', gap: 6, alignItems: 'center', alignSelf: 'center', padding: space.sm }}>
+          <Icon name="flag-outline" size={16} color={t.muted} />
+          <Text style={{ color: t.muted, fontWeight: '600' }}>{tr('Signaler ou bloquer ce membre')}</Text>
+        </Pressable>
+      ) : null}
     </Screen>
   );
 }

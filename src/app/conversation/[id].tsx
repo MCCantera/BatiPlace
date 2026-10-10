@@ -3,10 +3,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ReportSheet } from '@/components/report-sheet';
 import { Chip, Icon, Loading } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
 import type { Message } from '@/lib/database.types';
+import { isBlockedBetween } from '@/lib/moderation';
 import { locale, useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
@@ -24,6 +26,8 @@ export default function ConversationScreen() {
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
+  const [reporting, setReporting] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const listRef = useRef<FlatList<Message>>(null);
 
   const markRead = useCallback(async () => {
@@ -33,7 +37,16 @@ export default function ConversationScreen() {
 
   useEffect(() => {
     if (!id) return;
-    supabase.from('conversations').select(CONVERSATION_SELECT).eq('id', id).maybeSingle().then(({ data }) => setConv(data as unknown as ConversationRow));
+    supabase
+      .from('conversations')
+      .select(CONVERSATION_SELECT)
+      .eq('id', id)
+      .maybeSingle()
+      .then(async ({ data }) => {
+        const c = data as unknown as ConversationRow | null;
+        setConv(c);
+        if (c) setBlocked(await isBlockedBetween(c.buyer_id, c.seller_id));
+      });
     supabase
       .from('messages')
       .select('*')
@@ -66,16 +79,42 @@ export default function ConversationScreen() {
     const { data, error: err } = await supabase.from('messages').insert({ conversation_id: id, body }).select('*').single();
     if (err) {
       setText(body);
+      if (err.message.includes('row-level security') && conv && (await isBlockedBetween(conv.buyer_id, conv.seller_id))) {
+        setBlocked(true);
+        return;
+      }
       return setError(friendlyError(err));
     }
     setMessages((prev) => (prev && !prev.some((x) => x.id === data.id) ? [...prev, data] : prev));
   }
 
   const other = conv ? (conv.buyer_id === userId ? conv.seller : conv.buyer) : null;
+  const otherId = conv ? (conv.buyer_id === userId ? conv.seller_id : conv.buyer_id) : null;
 
   return (
     <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: t.bg }}>
-      <Stack.Screen options={{ title: other?.display_name || tr('Conversation') }} />
+      <Stack.Screen
+        options={{
+          title: other?.display_name || tr('Conversation'),
+          headerRight: () =>
+            otherId ? (
+              <Pressable onPress={() => setReporting(true)} accessibilityLabel={tr('Signaler ou bloquer')} hitSlop={10} style={{ paddingHorizontal: space.sm }}>
+                <Icon name="flag-outline" color={t.text} />
+              </Pressable>
+            ) : null,
+        }}
+      />
+      {otherId ? (
+        <ReportSheet
+          visible={reporting}
+          onClose={() => setReporting(false)}
+          userId={otherId}
+          userName={other?.display_name}
+          listingId={conv?.listing?.id}
+          conversationId={conv?.id}
+          onBlockChange={setBlocked}
+        />
+      ) : null}
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
         <View style={styles.column}>
           {conv?.listing ? (
@@ -113,31 +152,39 @@ export default function ConversationScreen() {
           )}
 
           <View style={{ paddingHorizontal: space.md, gap: space.sm }}>
-            <FlatList
-              horizontal
-              data={QUICK_REPLIES}
-              keyExtractor={(q) => q}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: space.sm }}
-              renderItem={({ item }) => <Chip label={tr(item)} onPress={() => setText(tr(item))} />}
-            />
-            {error ? <Text style={{ color: t.danger }}>{error}</Text> : null}
-            <View style={[styles.compose, { borderColor: t.line, backgroundColor: t.surface }]}>
-              <TextInput
-                value={text}
-                onChangeText={setText}
-                placeholder={tr('Écrire un message…')}
-                placeholderTextColor={t.muted}
-                style={{ flex: 1, color: t.text, fontSize: 16, paddingVertical: 10 }}
-                multiline
-                maxLength={2000}
-                onSubmitEditing={send}
-                accessibilityLabel={tr('Message')}
-              />
-              <Pressable onPress={send} accessibilityLabel={tr('Envoyer')} style={[styles.send, { backgroundColor: t.accent }]}>
-                <Icon name="send" size={16} color={t.accentText} />
-              </Pressable>
-            </View>
+            {blocked ? (
+              <Text style={{ color: t.muted, textAlign: 'center', paddingVertical: space.md }}>
+                {tr('Vous ne pouvez plus échanger de messages avec ce membre.')}
+              </Text>
+            ) : (
+              <>
+                <FlatList
+                  horizontal
+                  data={QUICK_REPLIES}
+                  keyExtractor={(q) => q}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: space.sm }}
+                  renderItem={({ item }) => <Chip label={tr(item)} onPress={() => setText(tr(item))} />}
+                />
+                {error ? <Text style={{ color: t.danger }}>{error}</Text> : null}
+                <View style={[styles.compose, { borderColor: t.line, backgroundColor: t.surface }]}>
+                  <TextInput
+                    value={text}
+                    onChangeText={setText}
+                    placeholder={tr('Écrire un message…')}
+                    placeholderTextColor={t.muted}
+                    style={{ flex: 1, color: t.text, fontSize: 16, paddingVertical: 10 }}
+                    multiline
+                    maxLength={2000}
+                    onSubmitEditing={send}
+                    accessibilityLabel={tr('Message')}
+                  />
+                  <Pressable onPress={send} accessibilityLabel={tr('Envoyer')} style={[styles.send, { backgroundColor: t.accent }]}>
+                    <Icon name="send" size={16} color={t.accentText} />
+                  </Pressable>
+                </View>
+              </>
+            )}
             <Text style={{ color: t.muted, fontSize: 12, textAlign: 'center', marginBottom: space.sm }}>
               {tr('Ne payez jamais avant d’avoir vu l’article.')}
             </Text>

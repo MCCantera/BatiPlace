@@ -158,6 +158,7 @@ function Account() {
       <View style={{ gap: space.sm, marginTop: space.lg }}>
         <Button kind="secondary" label={tr('Se déconnecter')} icon="log-out-outline" onPress={signOut} />
         <Button kind="secondary" small label={tr('Politique de confidentialité')} icon="shield-checkmark-outline" onPress={() => router.push('/confidentialite')} />
+        <Button kind="secondary" small label={tr('Conditions d’utilisation')} icon="document-text-outline" onPress={() => router.push('/conditions')} />
       </View>
     </Screen>
   );

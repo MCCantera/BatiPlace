@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { timeAgo } from '@/lib/catalog';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
 import { useI18n } from '@/lib/i18n';
+import { blockedIds } from '@/lib/moderation';
 import { useSeo } from '@/lib/seo';
 import { supabase } from '@/lib/supabase';
 import { radius, space, useTheme } from '@/lib/theme';
@@ -36,7 +37,8 @@ function Inbox() {
       let active = true;
       (async () => {
         const { data } = await supabase.from('conversations').select(CONVERSATION_SELECT).order('last_message_at', { ascending: false });
-        const convs = (data ?? []) as unknown as ConversationRow[];
+        const blocked = userId ? await blockedIds(userId) : new Set<string>();
+        const convs = ((data ?? []) as unknown as ConversationRow[]).filter((c) => !blocked.has(c.buyer_id) && !blocked.has(c.seller_id));
         const ids = convs.map((c) => c.id);
         const next: Record<string, Summary> = {};
         if (ids.length) {

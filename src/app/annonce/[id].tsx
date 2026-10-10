@@ -2,6 +2,7 @@ import { Link, Stack, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
+import { ReportSheet } from '@/components/report-sheet';
 import { Avatar, Button, Card, Empty, H1, Icon, ListingImage, Loading, Notice, P, Screen, Stars, Tag } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { category, conditionLabel, money, sellerTypeLabel, timeAgo } from '@/lib/catalog';
@@ -29,6 +30,7 @@ export default function ListingScreen() {
   const [photoIndex, setPhotoIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [reporting, setReporting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -185,12 +187,30 @@ export default function ListingScreen() {
       <Notice icon="shield-checkmark-outline" tone="ok">
         {tr('Aucune commission Bâtiplace. Vous payez le vendeur directement. Inspectez l’article avant de payer.')}
       </Notice>
+      {!mine ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => (userId ? setReporting(true) : router.push('/connexion'))}
+          style={{ flexDirection: 'row', gap: 6, alignItems: 'center', alignSelf: 'center', padding: space.sm }}>
+          <Icon name="flag-outline" size={16} color={t.muted} />
+          <Text style={{ color: t.muted, fontWeight: '600' }}>{tr('Signaler l’annonce ou bloquer le vendeur')}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 
   return (
     <Screen edges={[]}>
       <Stack.Screen options={{ title: item.title }} />
+      {!mine ? (
+        <ReportSheet
+          visible={reporting}
+          onClose={() => setReporting(false)}
+          userId={item.seller_id}
+          userName={item.seller?.display_name}
+          listingId={item.id}
+        />
+      ) : null}
       <View style={{ flexDirection: wide ? 'row' : 'column', gap: space.xl, alignItems: 'flex-start' }}>
         <View style={{ flex: wide ? 1.4 : undefined, width: wide ? undefined : '100%', gap: space.lg }}>
           {gallery}

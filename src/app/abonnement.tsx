@@ -68,6 +68,7 @@ export default function SubscriptionScreen() {
         <Text style={{ fontSize: 40, fontWeight: '800', color: t.text }}>
           {subscriptionPrice()} <Text style={{ fontSize: 16, fontWeight: '500', color: t.muted }}>{tr('/ mois, taxes en sus')}</Text>
         </Text>
+        <Text style={{ color: t.muted, fontSize: 14 }}>{tr('Durée : 1 mois, renouvelé automatiquement')}</Text>
         {PERKS.map((p) => (
           <View key={p} style={{ flexDirection: 'row', gap: space.sm, alignItems: 'center' }}>
             <Icon name="checkmark-circle" color={t.ok} />
@@ -92,8 +93,11 @@ export default function SubscriptionScreen() {
             {tr('Abonnement mensuel renouvelé automatiquement, facturé à votre compte {store}. Annulable en tout temps dans les réglages de votre téléphone, au moins 24 h avant la fin de la période en cours.', { store })}
           </P>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
-            <Text onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
+            <Text onPress={() => router.push('/conditions')} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
               {tr('Conditions d’utilisation')}
+            </Text>
+            <Text onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
+              {tr('Contrat de licence d’Apple (EULA)')}
             </Text>
             <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
               {tr('Politique de confidentialité')}

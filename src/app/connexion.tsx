@@ -1,15 +1,16 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { Button, Card, Chip, Field, H1, Notice, P, Screen } from '@/components/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, isSupabaseConfigured, supabase } from '@/lib/supabase';
-import { space } from '@/lib/theme';
+import { space, useTheme } from '@/lib/theme';
 
 export default function SignInScreen() {
   useSeo({ title: 'Connexion', noindex: true });
+  const t = useTheme();
   const { tr } = useI18n();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
@@ -84,7 +85,14 @@ export default function SignInScreen() {
         {mode === 'login' ? <Button kind="secondary" label={tr('Mot de passe oublié')} onPress={forgot} /> : null}
       </Card>
       <P muted style={{ fontSize: 13 }}>
-        {tr('En créant un compte, vous acceptez les conditions d’utilisation et la politique de confidentialité de Bâtiplace.')}
+        {tr('En créant un compte, vous acceptez les conditions d’utilisation et la politique de confidentialité de Bâtiplace.')}{' '}
+        <Text onPress={() => router.push('/conditions')} style={{ color: t.accent, fontWeight: '600' }}>
+          {tr('Conditions d’utilisation')}
+        </Text>
+        {' · '}
+        <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontWeight: '600' }}>
+          {tr('Politique de confidentialité')}
+        </Text>
       </P>
     </Screen>
   );
