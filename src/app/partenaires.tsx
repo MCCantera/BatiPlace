@@ -59,7 +59,7 @@ export default function PartnersScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
           {partners.map((p) => (
             <View key={p.id} style={{ width: columns === 1 ? '100%' : `${100 / columns - 2}%`, flexGrow: 1 }}>
-              <PartnerCard partner={p} />
+              <PartnerCard partner={p} stretch={columns > 1} />
             </View>
           ))}
         </View>
@@ -74,7 +74,7 @@ export default function PartnersScreen() {
   );
 }
 
-function PartnerCard({ partner: p }: { partner: Partner }) {
+function PartnerCard({ partner: p, stretch }: { partner: Partner; stretch: boolean }) {
   const t = useTheme();
   const { tr } = useI18n();
   const { userId, subscribed } = useAuth();
@@ -92,7 +92,8 @@ function PartnerCard({ partner: p }: { partner: Partner }) {
   const place = [p.address, p.city].filter(Boolean).join(', ');
 
   return (
-    <Card style={{ gap: space.md, height: '100%' }}>
+    // Same height for cards side by side; a single column must not stretch (on iOS 100% fills the screen).
+    <Card style={{ gap: space.md, height: stretch ? '100%' : undefined }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
         {p.logo_url ? (
           <Image source={{ uri: p.logo_url }} contentFit="contain" style={{ width: 56, height: 56, borderRadius: radius.md, backgroundColor: '#fff' }} />

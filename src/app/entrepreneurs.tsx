@@ -71,7 +71,7 @@ export default function ContractorsScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
           {contractors.map((c) => (
             <View key={c.id} style={{ width: columns === 1 ? '100%' : `${100 / columns - 2}%`, flexGrow: 1 }}>
-              <ContractorCard contractor={c} />
+              <ContractorCard contractor={c} stretch={columns > 1} />
             </View>
           ))}
         </View>
@@ -86,12 +86,13 @@ export default function ContractorsScreen() {
   );
 }
 
-function ContractorCard({ contractor: c }: { contractor: Contractor }) {
+function ContractorCard({ contractor: c, stretch }: { contractor: Contractor; stretch: boolean }) {
   const t = useTheme();
   const { tr } = useI18n();
   const website = c.website && !/^https?:\/\//.test(c.website) ? `https://${c.website}` : c.website;
   return (
-    <Card style={{ gap: space.md, height: '100%' }}>
+    // Same height for cards side by side; a single column must not stretch (on iOS 100% fills the screen).
+    <Card style={{ gap: space.md, height: stretch ? '100%' : undefined }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
         {c.logo_url ? (
           <Image source={{ uri: c.logo_url }} contentFit="contain" style={{ width: 52, height: 52, borderRadius: radius.md, backgroundColor: '#fff' }} />
