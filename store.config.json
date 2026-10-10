@@ -1,6 +1,8 @@
 {
   "configVersion": 0,
   "apple": {
+    "version": "1.0",
+    "copyright": "2026 Bâtiplace",
     "categories": [
       "SHOPPING",
       "LIFESTYLE"
@@ -27,7 +29,46 @@
         "marketingUrl": "https://www.batiplace.ca",
         "supportUrl": "https://www.batiplace.ca",
         "privacyPolicyUrl": "https://www.batiplace.ca/confidentialite"
+      },
+      "en-US": {
+        "title": "Bâtiplace",
+        "subtitle": "Building materials in Québec",
+        "promoText": "Free to post, zero commission. Buy and sell building materials, tools and equipment near you, anywhere in Québec.",
+        "description": "Bâtiplace is the construction marketplace in Québec.\n\nBuy and sell new or used building materials, tools and equipment between neighbours, individuals and professionals, anywhere in Québec. Free to post, zero commission.\n\n• Find it near you: tile, drywall, lumber, doors and windows, plumbing, electrical, tools, machinery and job-site surplus.\n• Search by city and distance, from 10 km to all of Québec.\n• Post a listing in seconds with your photos.\n• Chat directly with the seller in the app.\n• Save your finds to favourites.\n• Check seller profiles and ratings, and spot professionals with an RBQ licence.\n• Find a partner contractor for your project.\n\nOne crew's surplus, another crew's job site: give materials a second life and save on your projects.\n\nFree: 5 active listings. Bâtiplace Unlimited: unlimited listings and exclusive partner discounts. Monthly subscription, renews automatically, cancel anytime in your Apple account settings.\n\nThe app is available in French and English.",
+        "keywords": [
+          "construction",
+          "materials",
+          "tools",
+          "renovation",
+          "surplus",
+          "lumber",
+          "hardware",
+          "used",
+          "Quebec",
+          "RBQ",
+          "marketplace"
+        ],
+        "marketingUrl": "https://www.batiplace.ca",
+        "supportUrl": "https://www.batiplace.ca",
+        "privacyPolicyUrl": "https://www.batiplace.ca/confidentialite"
       }
+    },
+    "advisory": {
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "matureOrSuggestiveThemes": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "gambling": false,
+      "unrestrictedWebAccess": false,
+      "kidsAgeBand": null
     }
   }
 }
