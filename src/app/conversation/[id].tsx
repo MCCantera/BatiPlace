@@ -1,4 +1,4 @@
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -118,13 +118,14 @@ export default function ConversationScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
         <View style={styles.column}>
           {conv?.listing ? (
-            <Link href={{ pathname: '/annonce/[id]', params: { id: conv.listing.id } }} asChild>
-              <Pressable style={() => [styles.listing, { backgroundColor: t.surface, borderColor: t.line }]}>
-                <Icon name="pricetag-outline" color={t.brand} />
-                <Text numberOfLines={1} style={{ flex: 1, color: t.text, fontWeight: '600' }}>{conv.listing.title}</Text>
-                <Icon name="chevron-forward" color={t.muted} />
-              </Pressable>
-            </Link>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push({ pathname: '/annonce/[id]', params: { id: conv.listing!.id } })}
+              style={[styles.listing, { backgroundColor: t.surface, borderColor: t.line }]}>
+              <Icon name="pricetag-outline" color={t.brand} />
+              <Text numberOfLines={1} style={{ flex: 1, color: t.text, fontWeight: '600' }}>{conv.listing.title}</Text>
+              <Icon name="chevron-forward" color={t.muted} />
+            </Pressable>
           ) : null}
 
           {messages === null ? (

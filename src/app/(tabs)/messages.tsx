@@ -1,9 +1,9 @@
-import { Link, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { RequireAuth } from '@/components/require-auth';
-import { Avatar, Empty, H1, Loading, Screen } from '@/components/ui';
+import { Avatar, Empty, H1, Icon, Loading, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { timeAgo } from '@/lib/catalog';
 import { CONVERSATION_SELECT, type ConversationRow } from '@/lib/conversations';
@@ -73,33 +73,46 @@ function Inbox() {
         <Empty title={tr('Aucune conversation')} body={tr('Touchez « Contacter le vendeur » sur une annonce pour démarrer une conversation.')} />
       ) : (
         <View style={[styles.list, { borderColor: t.line, backgroundColor: t.surface }]}>
-          {rows.map((c) => {
+          {rows.map((c, i) => {
             const other = c.buyer_id === userId ? c.seller : c.buyer;
             const s = summaries[c.id];
-            // A plain style array on the Pressable breaks Link asChild on the web (white page); a style function works, as in ListingCard.
+            // Plain Pressable + router: Link asChild on the web lost the row layout (and crashed with a style array).
             return (
-              <Link key={c.id} href={{ pathname: '/conversation/[id]', params: { id: c.id } }} asChild>
-                <Pressable style={({ pressed }) => [styles.row, { borderColor: t.line }, pressed && { opacity: 0.8 }]}>
-                  <Avatar name={other?.display_name ?? '?'} uri={other?.avatar_url} />
-                  <View style={{ flex: 1, minWidth: 0 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.sm }}>
-                      <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flex: 1 }}>
-                        {other?.display_name || tr('Membre Bâtiplace')}
-                      </Text>
-                      <Text style={{ color: t.muted, fontSize: 12 }}>{timeAgo(c.last_message_at)}</Text>
-                    </View>
-                    <Text numberOfLines={1} style={{ color: t.text, fontSize: 13 }}>{c.listing?.title ?? tr('Annonce retirée')}</Text>
-                    <Text numberOfLines={1} style={{ color: t.muted, fontSize: 13 }}>
-                      {s ? `${s.mine ? tr('Vous : ') : ''}${s.last}` : tr('Pas encore de message')}
+              <Pressable
+                key={c.id}
+                accessibilityRole="link"
+                onPress={() => router.push({ pathname: '/conversation/[id]', params: { id: c.id } })}
+                style={({ pressed }) => [
+                  styles.row,
+                  { borderColor: t.line, backgroundColor: pressed ? t.surface2 : t.surface },
+                  i === rows.length - 1 && { borderBottomWidth: 0 },
+                ]}>
+                <Avatar name={other?.display_name ?? '?'} uri={other?.avatar_url} size={48} />
+                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: space.sm }}>
+                    <Text numberOfLines={1} style={{ color: t.text, fontWeight: s?.unread ? '800' : '700', fontSize: 16, flex: 1 }}>
+                      {other?.display_name || tr('Membre Bâtiplace')}
+                    </Text>
+                    <Text style={{ color: t.muted, fontSize: 12 }}>{timeAgo(c.last_message_at)}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Icon name="pricetag-outline" size={13} color={t.brand} />
+                    <Text numberOfLines={1} style={{ color: t.brand, fontSize: 13, fontWeight: '600', flexShrink: 1 }}>
+                      {c.listing?.title ?? tr('Annonce retirée')}
                     </Text>
                   </View>
-                  {s?.unread ? (
-                    <View style={[styles.badge, { backgroundColor: t.accent }]}>
-                      <Text style={{ color: t.accentText, fontSize: 12, fontWeight: '700' }}>{s.unread}</Text>
-                    </View>
-                  ) : null}
-                </Pressable>
-              </Link>
+                  <Text numberOfLines={1} style={{ color: s?.unread ? t.text : t.muted, fontSize: 14, fontWeight: s?.unread ? '600' : '400' }}>
+                    {s ? `${s.mine ? tr('Vous : ') : ''}${s.last}` : tr('Pas encore de message')}
+                  </Text>
+                </View>
+                {s?.unread ? (
+                  <View style={[styles.badge, { backgroundColor: t.accent }]}>
+                    <Text style={{ color: t.accentText, fontSize: 12, fontWeight: '700' }}>{s.unread}</Text>
+                  </View>
+                ) : (
+                  <Icon name="chevron-forward" size={18} color={t.muted} />
+                )}
+              </Pressable>
             );
           })}
         </View>
@@ -109,7 +122,7 @@ function Inbox() {
 }
 
 const styles = StyleSheet.create({
-  list: { borderWidth: 1, borderRadius: radius.lg, overflow: 'hidden' },
+  list: { borderWidth: 1, borderRadius: radius.lg, overflow: 'hidden', width: '100%', maxWidth: 760 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderBottomWidth: StyleSheet.hairlineWidth },
   badge: { minWidth: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
 });
