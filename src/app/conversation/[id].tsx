@@ -119,7 +119,7 @@ export default function ConversationScreen() {
         <View style={styles.column}>
           {conv?.listing ? (
             <Link href={{ pathname: '/annonce/[id]', params: { id: conv.listing.id } }} asChild>
-              <Pressable style={[styles.listing, { backgroundColor: t.surface, borderColor: t.line }]}>
+              <Pressable style={() => [styles.listing, { backgroundColor: t.surface, borderColor: t.line }]}>
                 <Icon name="pricetag-outline" color={t.brand} />
                 <Text numberOfLines={1} style={{ flex: 1, color: t.text, fontWeight: '600' }}>{conv.listing.title}</Text>
                 <Icon name="chevron-forward" color={t.muted} />

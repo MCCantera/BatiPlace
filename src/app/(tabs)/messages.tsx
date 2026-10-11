@@ -76,9 +76,10 @@ function Inbox() {
           {rows.map((c) => {
             const other = c.buyer_id === userId ? c.seller : c.buyer;
             const s = summaries[c.id];
+            // A plain style array on the Pressable breaks Link asChild on the web (white page); a style function works, as in ListingCard.
             return (
               <Link key={c.id} href={{ pathname: '/conversation/[id]', params: { id: c.id } }} asChild>
-                <Pressable style={[styles.row, { borderColor: t.line }]}>
+                <Pressable style={({ pressed }) => [styles.row, { borderColor: t.line }, pressed && { opacity: 0.8 }]}>
                   <Avatar name={other?.display_name ?? '?'} uri={other?.avatar_url} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space.sm }}>
