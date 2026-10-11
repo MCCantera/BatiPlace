@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -122,19 +122,24 @@ export default function ExploreScreen() {
           <Text style={{ fontSize: 34, fontWeight: '800', color: t.text, letterSpacing: -0.8, lineHeight: 38 }}>
             Bâti<Text style={{ color: t.brand }}>place</Text>
           </Text>
-          <Text style={{ fontSize: 15, color: t.muted }}>{tr('Le marketplace de la construction au Québec')}</Text>
+          <Text role="heading" aria-level={1} style={{ fontSize: 15, color: t.muted }}>
+            {tr('Le marketplace de la construction au Québec')}
+          </Text>
         </View>
         <LanguageToggle />
       </View>
 
       <View style={[styles.hero, { backgroundColor: t.accentSoft }]}>
-        <Text style={{ fontSize: 24, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
+        <Text role="heading" aria-level={2} style={{ fontSize: 24, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
           {tr('Le surplus des uns,')} <Text style={{ color: t.accent }}>{tr('le chantier des autres.')}</Text>
         </Text>
         <P muted>
           {tr(
             'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.',
-          )}
+          )}{' '}
+          <Link href="/marketplace-construction" style={{ color: t.accent, fontWeight: '600' }}>
+            {tr('Comment ça marche ?')}
+          </Link>
         </P>
         <Pressable
           accessibilityRole="link"

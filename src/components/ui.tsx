@@ -55,12 +55,21 @@ export function Screen({
 
 export function H1({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
   const t = useTheme();
-  return <Text style={[styles.h1, { color: t.text }, style]}>{children}</Text>;
+  // role/aria-level: a real <h1>/<h2> on the web, for Google and screen readers.
+  return (
+    <Text role="heading" aria-level={1} style={[styles.h1, { color: t.text }, style]}>
+      {children}
+    </Text>
+  );
 }
 
 export function H2({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
   const t = useTheme();
-  return <Text style={[styles.h2, { color: t.text }, style]}>{children}</Text>;
+  return (
+    <Text role="heading" aria-level={2} style={[styles.h2, { color: t.text }, style]}>
+      {children}
+    </Text>
+  );
 }
 
 export function P({

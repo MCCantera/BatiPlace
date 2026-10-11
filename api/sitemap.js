@@ -3,6 +3,7 @@ const { SITE_URL, rest, slugify } = require('./_shared');
 
 const STATIC_PAGES = [
   ['/', 'daily', '1.0'],
+  ['/marketplace-construction', 'monthly', '0.9'],
   ['/entrepreneurs', 'weekly', '0.8'],
   ['/publier', 'monthly', '0.8'],
   ['/partenaires', 'weekly', '0.6'],

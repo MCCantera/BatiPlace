@@ -1,5 +1,6 @@
 // Explore (home) screen, favorites, listing card, city field, shared UI and sign-in gate.
 const en: Record<string, string> = {
+  'Comment ça marche ?': 'How does it work?',
   // Explore
   Pertinence: 'Relevance',
   'Plus proches': 'Nearest',

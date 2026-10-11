@@ -9,8 +9,11 @@ export type Lang = 'fr' | 'en';
 const STORE_KEY = 'batiplace.lang';
 
 function deviceLang(): Lang {
+  // The web site opens in French (the English button is saved once chosen): Google crawls with an English browser
+  // and must index the French site.
+  if (Platform.OS === 'web') return 'fr';
   try {
-    const locale = Platform.OS === 'web' && typeof navigator !== 'undefined' ? navigator.language : Intl.DateTimeFormat().resolvedOptions().locale;
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
     return locale?.toLowerCase().startsWith('en') ? 'en' : 'fr';
   } catch {
     return 'fr';
