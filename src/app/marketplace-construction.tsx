@@ -154,6 +154,12 @@ export default function MarketplaceScreen() {
           <Link href="/partenaires" style={{ color: t.accent, fontWeight: '600' }}>
             {c.partners}
           </Link>
+          <Link href="/outils-usages" style={{ color: t.accent, fontWeight: '600' }}>
+            {lang === 'en' ? 'Used tools' : 'Outils usagés et d’occasion'}
+          </Link>
+          <Link href="/materiaux-usages" style={{ color: t.accent, fontWeight: '600' }}>
+            {lang === 'en' ? 'Used materials' : 'Matériel et matériaux usagés'}
+          </Link>
         </View>
       </View>
     </Screen>
