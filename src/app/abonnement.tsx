@@ -92,15 +92,15 @@ export default function SubscriptionScreen() {
           <P muted style={{ fontSize: 12 }}>
             {tr('Abonnement mensuel renouvelé automatiquement, facturé à votre compte {store}. Annulable en tout temps dans les réglages de votre téléphone, au moins 24 h avant la fin de la période en cours.', { store })}
           </P>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
-            <Text onPress={() => router.push('/conditions')} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
-              {tr('Conditions d’utilisation')}
+          <View style={{ gap: space.sm }}>
+            <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 14, fontWeight: '600' }}>
+              {tr('Conditions d’utilisation (EULA)')}
             </Text>
-            <Text onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
-              {tr('Contrat de licence d’Apple (EULA)')}
-            </Text>
-            <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontSize: 12, fontWeight: '600' }}>
+            <Text accessibilityRole="link" onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontSize: 14, fontWeight: '600' }}>
               {tr('Politique de confidentialité')}
+            </Text>
+            <Text accessibilityRole="link" onPress={() => router.push('/conditions')} style={{ color: t.accent, fontSize: 14, fontWeight: '600' }}>
+              {tr('Conditions de Bâtiplace')}
             </Text>
           </View>
         </View>

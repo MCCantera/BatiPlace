@@ -29,6 +29,8 @@ const en: Record<string, string> = {
 
   // Abonnement
   'Contrat de licence d’Apple (EULA)': 'Apple license agreement (EULA)',
+  'Conditions d’utilisation (EULA)': 'Terms of Use (EULA)',
+  'Conditions de Bâtiplace': 'Bâtiplace terms',
   'Durée : 1 mois, renouvelé automatiquement': 'Length: 1 month, renews automatically',
 
   // Conditions d’utilisation
