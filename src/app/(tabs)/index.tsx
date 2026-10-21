@@ -135,7 +135,7 @@ export default function ExploreScreen() {
         </Text>
         <P muted>
           {tr(
-            'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.',
+            'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. 5 annonces gratuites, zéro commission.',
           )}{' '}
           <Link href="/marketplace-construction" style={{ color: t.accent, fontWeight: '600' }}>
             {tr('Comment ça marche ?')}
@@ -146,7 +146,7 @@ export default function ExploreScreen() {
           onPress={() => router.push('/partenaires')}
           style={({ pressed }) => [styles.partners, { backgroundColor: t.surface }, pressed && { opacity: 0.85 }]}>
           <Icon name="pricetags-outline" size={18} color={t.accent} />
-          <Text style={{ color: t.text, fontWeight: '700', flexShrink: 1 }}>{tr('Rabais exclusifs chez nos partenaires')}</Text>
+          <Text style={{ color: t.text, fontWeight: '700', flexShrink: 1 }}>{tr('Rabais partenaires pour les abonnés')}</Text>
           <Icon name="chevron-forward" size={16} color={t.muted} />
         </Pressable>
       </View>

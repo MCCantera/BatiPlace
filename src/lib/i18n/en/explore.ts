@@ -9,9 +9,9 @@ const en: Record<string, string> = {
   'Impossible de charger les annonces. Vérifiez votre connexion.': 'Couldn’t load listings. Check your connection.',
   'Le surplus des uns,': 'One crew’s surplus,',
   'le chantier des autres.': 'another crew’s job site.',
-  'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.':
-    'Buy and sell new or used materials, tools and equipment between neighbours, individuals and professionals, anywhere in Québec. Free to post, zero commission.',
-  'Rabais exclusifs chez nos partenaires': 'Exclusive discounts from our partners',
+  'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. 5 annonces gratuites, zéro commission.':
+    'Buy and sell new or used materials, tools and equipment between neighbours, individuals and professionals, anywhere in Québec. 5 free listings, zero commission.',
+  'Rabais partenaires pour les abonnés': 'Partner discounts for subscribers',
   'Vous cherchez un entrepreneur ?': 'Looking for a contractor?',
   'Trouvez un pro près de chez vous pour vos travaux.': 'Find a pro near you for your project.',
   'Ex. : je cherche de la céramique à Laval': 'E.g. I’m looking for ceramic tile in Laval',

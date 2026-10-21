@@ -65,8 +65,6 @@ const en: Record<string, string> = {
   'App Store ou Google Play': 'App Store or Google Play',
   'Annonces illimitées': 'Unlimited listings',
   'Valable dans l’application et sur le site Web': 'Valid in the app and on the website',
-  'Badge Pro et licence RBQ affichée': 'Pro badge and RBQ licence displayed',
-  'Statistiques de vues et de messages': 'View and message statistics',
   'Rabais exclusifs chez nos partenaires': 'Exclusive discounts from our partners',
   'Toujours 0 % de commission sur vos ventes': 'Always 0% commission on your sales',
   'Merci ! Votre abonnement est actif.': 'Thank you! Your subscription is active.',

@@ -16,8 +16,6 @@ const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stde
 const PERKS = [
   'Annonces illimitées',
   'Valable dans l’application et sur le site Web',
-  'Badge Pro et licence RBQ affichée',
-  'Statistiques de vues et de messages',
   'Rabais exclusifs chez nos partenaires',
   'Toujours 0 % de commission sur vos ventes',
 ];
