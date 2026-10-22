@@ -6,6 +6,17 @@ import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { space, useTheme } from '@/lib/theme';
 
+/** Every SEO page links to the others so Google finds them all (path, French label, English label). */
+export const LANDING_LINKS = [
+  ['/outils-usages', 'Outils usagés', 'Used tools'],
+  ['/materiaux-usages', 'Matériaux usagés', 'Used materials'],
+  ['/surplus-de-chantier', 'Surplus de chantier', 'Job site surplus'],
+  ['/bois-usage', 'Bois usagé', 'Used lumber'],
+  ['/portes-fenetres-usagees', 'Portes et fenêtres usagées', 'Used doors and windows'],
+  ['/machinerie-usagee', 'Machinerie usagée', 'Used machinery'],
+  ['/plomberie-electricite-usagee', 'Plomberie et électricité', 'Plumbing and electrical'],
+] as const;
+
 export type LandingContent = {
   h1: string;
   intro: string;
@@ -19,7 +30,16 @@ export type LandingContent = {
  * A page written for one Google search (« outils usagés », « matériel usagé »…): real text about what people
  * find on Bâtiplace, a FAQ marked up as FAQPage, and links to the listings. The French version is what Google indexes.
  */
-export function LandingPage({ seo, content }: { seo: { title: string; path: string }; content: { fr: LandingContent; en: LandingContent } }) {
+export function LandingPage({
+  seo,
+  content,
+  category,
+}: {
+  seo: { title: string; path: string };
+  content: { fr: LandingContent; en: LandingContent };
+  /** Explorer opens filtered on this category from the « browse » button. */
+  category?: string;
+}) {
   const t = useTheme();
   const { lang } = useI18n();
   const c = content[lang];
@@ -40,7 +60,7 @@ export function LandingPage({ seo, content }: { seo: { title: string; path: stri
           <H1>{c.h1}</H1>
           <P>{c.intro}</P>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-            <Button label={c.browse} onPress={() => router.push('/')} />
+            <Button label={c.browse} onPress={() => router.push(category ? { pathname: '/', params: { categorie: category } } : '/')} />
             <Button kind="secondary" label={c.post} onPress={() => router.push('/publier')} />
           </View>
         </View>
@@ -74,12 +94,11 @@ export function LandingPage({ seo, content }: { seo: { title: string; path: stri
           <Link href="/marketplace-construction" style={{ color: t.accent, fontWeight: '600' }}>
             {lang === 'en' ? 'The construction marketplace in Québec' : 'Le marketplace de la construction au Québec'}
           </Link>
-          <Link href="/outils-usages" style={{ color: t.accent, fontWeight: '600' }}>
-            {lang === 'en' ? 'Used tools' : 'Outils usagés'}
-          </Link>
-          <Link href="/materiaux-usages" style={{ color: t.accent, fontWeight: '600' }}>
-            {lang === 'en' ? 'Used materials' : 'Matériaux usagés'}
-          </Link>
+          {LANDING_LINKS.filter(([path]) => path !== seo.path).map(([path, fr, en]) => (
+            <Link key={path} href={path} style={{ color: t.accent, fontWeight: '600' }}>
+              {lang === 'en' ? en : fr}
+            </Link>
+          ))}
         </View>
       </View>
     </Screen>

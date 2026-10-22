@@ -42,6 +42,11 @@ function Navigator() {
       <Stack.Screen name="marketplace-construction" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="outils-usages" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="materiaux-usages" options={{ title: 'Bâtiplace' }} />
+      <Stack.Screen name="surplus-de-chantier" options={{ title: 'Bâtiplace' }} />
+      <Stack.Screen name="bois-usage" options={{ title: 'Bâtiplace' }} />
+      <Stack.Screen name="portes-fenetres-usagees" options={{ title: 'Bâtiplace' }} />
+      <Stack.Screen name="machinerie-usagee" options={{ title: 'Bâtiplace' }} />
+      <Stack.Screen name="plomberie-electricite-usagee" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="devenir-partenaire" options={{ title: tr('Devenir partenaire') }} />
       <Stack.Screen name="confidentialite" options={{ title: tr('Confidentialité') }} />
       <Stack.Screen name="conditions" options={{ title: tr('Conditions d’utilisation') }} />
