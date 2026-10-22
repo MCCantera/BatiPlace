@@ -1,4 +1,4 @@
-import { Link, router } from 'expo-router';
+import { Link, router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -46,6 +46,11 @@ export default function ExploreScreen() {
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
   const [cats, setCats] = useState<string[]>([]);
+  // /?categorie=bois opens Explorer filtered on one category (links from the SEO pages).
+  const { categorie } = useLocalSearchParams<{ categorie?: string }>();
+  useEffect(() => {
+    if (categorie && CATEGORIES.some((c) => c.id === categorie)) setCats([categorie]);
+  }, [categorie]);
   const [conds, setConds] = useState<ListingCondition[]>([]);
   const [proOnly, setProOnly] = useState<boolean | null>(null);
   const [sort, setSort] = useState('pertinence');
