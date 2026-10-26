@@ -1,6 +1,7 @@
 import { Link, router } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
+import { LANDING_LINKS, categoryHref } from '@/components/landing-page';
 import { Button, Card, H1, H2, P, Screen } from '@/components/ui';
 import { CATEGORIES } from '@/lib/catalog';
 import { useI18n } from '@/lib/i18n';
@@ -106,9 +107,11 @@ export default function MarketplaceScreen() {
           <P muted>{c.whatBody}</P>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
             {CATEGORIES.map((cat) => (
-              <View key={cat.id} style={{ backgroundColor: cat.tint, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-                <Text style={{ color: cat.ink, fontWeight: '600', fontSize: 13 }}>{cat.name}</Text>
-              </View>
+              <Link key={cat.id} href={categoryHref(cat.id)} asChild>
+                <Pressable style={{ backgroundColor: cat.tint, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
+                  <Text style={{ color: cat.ink, fontWeight: '600', fontSize: 13 }}>{cat.name}</Text>
+                </Pressable>
+              </Link>
             ))}
           </View>
         </View>
@@ -154,12 +157,11 @@ export default function MarketplaceScreen() {
           <Link href="/partenaires" style={{ color: t.accent, fontWeight: '600' }}>
             {c.partners}
           </Link>
-          <Link href="/outils-usages" style={{ color: t.accent, fontWeight: '600' }}>
-            {lang === 'en' ? 'Used tools' : 'Outils usagés et d’occasion'}
-          </Link>
-          <Link href="/materiaux-usages" style={{ color: t.accent, fontWeight: '600' }}>
-            {lang === 'en' ? 'Used materials' : 'Matériel et matériaux usagés'}
-          </Link>
+          {LANDING_LINKS.map(([path, fr, en]) => (
+            <Link key={path} href={path} style={{ color: t.accent, fontWeight: '600' }}>
+              {lang === 'en' ? en : fr}
+            </Link>
+          ))}
         </View>
       </View>
     </Screen>
