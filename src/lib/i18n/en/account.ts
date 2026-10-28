@@ -82,7 +82,6 @@ const en: Record<string, string> = {
   'Code activé ! Votre accès Illimité est actif, sur le site et dans l’application.': 'Code activated! Your Unlimited access is active on the website and in the app.',
   'Accès Illimité offert avec le code {code}, jusqu’au {date}.': 'Unlimited access offered with code {code}, until {date}.',
   'Vous avez un code partenaire ?': 'Have a partner code?',
-  'Ex. : RENOGO': 'E.g. RENOGO',
   'Activer le code': 'Activate code',
   'Se connecter pour activer le code': 'Sign in to activate the code',
   'Aucun abonnement trouvé sur ce compte {store}.': 'No subscription found on this {store} account.',

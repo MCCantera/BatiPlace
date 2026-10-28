@@ -135,7 +135,6 @@ export default function SubscriptionScreen() {
               label={tr('Vous avez un code partenaire ?')}
               value={code}
               onChangeText={(v) => setCode(v.toUpperCase())}
-              placeholder={tr('Ex. : RENOGO')}
               autoCapitalize="characters"
               autoCorrect={false}
               onSubmitEditing={redeem}
