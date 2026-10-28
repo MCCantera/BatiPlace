@@ -1,17 +1,26 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Linking, Platform, Text, View } from 'react-native';
 
-import { Button, Card, H1, Icon, Notice, P, Screen } from '@/components/ui';
+import { Button, Card, Field, H1, Icon, Notice, P, Screen } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { FREE_LISTING_LIMIT, subscriptionPrice } from '@/lib/catalog';
-import { useI18n } from '@/lib/i18n';
+import { locale, useI18n } from '@/lib/i18n';
 import { buySubscription, purchasesAvailable, restorePurchases, storeName } from '@/lib/purchases';
 import { useSeo } from '@/lib/seo';
+import { supabase } from '@/lib/supabase';
 import { space, useTheme } from '@/lib/theme';
 
 // Apple's standard licence agreement, required next to an auto-renewable subscription.
 const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+
+// Partner codes are redeemed on the web only: Apple forbids unlocking features in the app other than through in-app purchase.
+const PROMO_ERRORS: Record<string, string> = {
+  CODE_INVALIDE: 'Ce code n’est pas valide ou a expiré.',
+  CODE_EPUISE: 'Ce code a atteint son nombre maximal d’utilisations.',
+  CODE_DEJA_UTILISE: 'Vous avez déjà utilisé ce code.',
+  DEJA_ABONNE: 'Votre abonnement est déjà actif.',
+};
 
 const PERKS = [
   'Annonces illimitées',
@@ -30,6 +39,34 @@ export default function SubscriptionScreen() {
   const { userId, subscribed, refresh } = useAuth();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [code, setCode] = useState('');
+  const [promo, setPromo] = useState<{ code: string; until: string } | null>(null);
+
+  useEffect(() => {
+    if (!userId || !subscribed) return setPromo(null);
+    supabase
+      .from('subscriptions')
+      .select('store, product_id, expires_at')
+      .eq('user_id', userId)
+      .maybeSingle()
+      .then(({ data }) => setPromo(data?.store === 'promo' && data.expires_at ? { code: data.product_id ?? '', until: data.expires_at } : null));
+  }, [userId, subscribed]);
+
+  async function redeem() {
+    if (!userId) return router.push('/connexion');
+    if (!code.trim()) return;
+    setBusy(true);
+    setMessage('');
+    const { error } = await supabase.rpc('redeem_promo_code', { p_code: code.trim() });
+    setBusy(false);
+    if (error) {
+      const key = Object.keys(PROMO_ERRORS).find((k) => error.message.includes(k));
+      return setMessage(tr(key ? PROMO_ERRORS[key] : 'Le code n’a pas pu être activé. Réessayez dans un instant.'));
+    }
+    setCode('');
+    await refresh();
+    setMessage(tr('Code activé ! Votre accès Illimité est actif, sur le site et dans l’application.'));
+  }
 
   async function subscribe() {
     if (!userId) return router.push('/connexion');
@@ -77,14 +114,35 @@ export default function SubscriptionScreen() {
         ))}
       </Card>
 
-      {subscribed ? (
+      {subscribed && promo ? (
+        <Notice tone="ok" icon="gift-outline">
+          {tr('Accès Illimité offert avec le code {code}, jusqu’au {date}.', {
+            code: promo.code,
+            date: new Date(promo.until).toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric' }),
+          })}
+        </Notice>
+      ) : subscribed ? (
         <Notice tone="ok" icon="checkmark-circle-outline">
           {tr('Votre abonnement est actif. Pour l’annuler ou le modifier, ouvrez les réglages d’abonnement de votre téléphone ({store}).', { store })}
         </Notice>
       ) : Platform.OS === 'web' ? (
-        <Notice icon="phone-portrait-outline">
-          {tr('L’abonnement s’achète dans l’application Bâtiplace sur iPhone ou Android, avec votre compte App Store ou Google Play. Connectez-vous ensuite ici avec le même compte : vos annonces illimitées fonctionnent aussi sur le site Web.')}
-        </Notice>
+        <View style={{ gap: space.md }}>
+          <Notice icon="phone-portrait-outline">
+            {tr('L’abonnement s’achète dans l’application Bâtiplace sur iPhone ou Android, avec votre compte App Store ou Google Play. Connectez-vous ensuite ici avec le même compte : vos annonces illimitées fonctionnent aussi sur le site Web.')}
+          </Notice>
+          <Card style={{ gap: space.sm }}>
+            <Field
+              label={tr('Vous avez un code partenaire ?')}
+              value={code}
+              onChangeText={(v) => setCode(v.toUpperCase())}
+              placeholder={tr('Ex. : RENOGO')}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              onSubmitEditing={redeem}
+            />
+            <Button label={userId ? tr('Activer le code') : tr('Se connecter pour activer le code')} icon="gift-outline" loading={busy} onPress={redeem} />
+          </Card>
+        </View>
       ) : (
         <View style={{ gap: space.sm }}>
           <Button label={tr('S’abonner avec {store}', { store })} icon="card-outline" loading={busy} onPress={subscribe} disabled={!purchasesAvailable} />

@@ -223,6 +223,7 @@ export type Database = {
       increment_listing_view: { Args: { listing: string }; Returns: undefined };
       has_active_subscription: { Args: { uid: string }; Returns: boolean };
       partner_promo_code: { Args: { partner: string }; Returns: string | null };
+      redeem_promo_code: { Args: { p_code: string }; Returns: string };
       is_blocked_between: { Args: { a: string; b: string }; Returns: boolean };
     };
     Enums: {
