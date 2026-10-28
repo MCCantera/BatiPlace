@@ -163,7 +163,7 @@ export default function ExploreScreen() {
         <Icon name="construct-outline" size={26} color={t.brandText} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={{ color: t.brandText, fontWeight: '800', fontSize: 17 }}>{tr('Vous cherchez un entrepreneur ?')}</Text>
-          <Text style={{ color: t.brandText, opacity: 0.85 }}>{tr('Trouvez un pro près de chez vous pour vos travaux.')}</Text>
+          <Text style={{ color: t.brandText, opacity: 0.85 }}>{tr('Trouvez un pro avec notre partenaire RenoGo.')}</Text>
         </View>
         <Icon name="chevron-forward" color={t.brandText} />
       </Pressable>

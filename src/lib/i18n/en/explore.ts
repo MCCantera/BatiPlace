@@ -13,7 +13,7 @@ const en: Record<string, string> = {
     'Buy and sell new or used materials, tools and equipment between neighbours, individuals and professionals, anywhere in Québec. Free to post, zero commission.',
   'Rabais exclusifs chez nos partenaires': 'Exclusive discounts from our partners',
   'Vous cherchez un entrepreneur ?': 'Looking for a contractor?',
-  'Trouvez un pro près de chez vous pour vos travaux.': 'Find a pro near you for your project.',
+  'Trouvez un pro avec notre partenaire RenoGo.': 'Find a pro with our partner RenoGo.',
   'Ex. : je cherche de la céramique à Laval': 'E.g. I’m looking for ceramic tile in Laval',
   Rechercher: 'Search',
   'Aucune annonce ne mentionne « {words} » pour l’instant. Voici les annonces de {cats}.':
