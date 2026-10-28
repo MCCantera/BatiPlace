@@ -17,7 +17,7 @@ export default function ContractorsScreen() {
   return (
     <Screen edges={[]}>
       <View style={{ gap: space.sm }}>
-        <H1>{tr('Vous cherchez un entrepreneur ?')}</H1>
+        <H1>{tr('Vous cherchez un entrepreneur ?')}</H1>
         <P muted>{tr('Bâtiplace s’associe à RenoGo pour vous aider à trouver un pro près de chez vous pour vos travaux.')}</P>
       </View>
 
@@ -36,7 +36,7 @@ export default function ContractorsScreen() {
       </Card>
 
       <Card style={{ gap: space.sm, backgroundColor: t.surface2 }}>
-        <Text style={{ color: t.text, fontWeight: '700', fontSize: 15 }}>{tr('Vous êtes entrepreneur ?')}</Text>
+        <Text style={{ color: t.text, fontWeight: '700', fontSize: 15 }}>{tr('Vous êtes entrepreneur ?')}</Text>
         <P muted>{tr('Faites-vous connaître auprès de nouveaux clients sur RenoGo.')}</P>
         <Button kind="secondary" icon="open-outline" label={tr('S’inscrire sur RenoGo')} onPress={() => Linking.openURL(RENOGO_URL)} />
       </Card>
