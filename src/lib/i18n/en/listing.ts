@@ -13,6 +13,7 @@ const en: Record<string, string> = {
   '{n} vues': '{n} views',
   Vendue: 'Sold',
   Retirée: 'Removed',
+  'En attente de retrait': 'Awaiting pickup',
   'C’est votre annonce. Gérez-la dans l’onglet Compte.': 'This is your listing. Manage it from the Account tab.',
   'Contacter le vendeur': 'Contact the seller',
   Sauvegardée: 'Saved',

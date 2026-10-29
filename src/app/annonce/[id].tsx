@@ -117,7 +117,7 @@ export default function ListingScreen() {
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           <Tag label={conditionLabel(item.condition)} tone={item.condition === 'neuf' ? 'ok' : item.condition === 'surplus' ? 'accent' : 'neutral'} />
           <Tag label={tr(cat.name)} />
-          {item.status !== 'active' ? <Tag label={item.status === 'vendue' ? tr('Vendue') : tr('Retirée')} tone="accent" /> : null}
+          {item.status !== 'active' ? <Tag label={item.status === 'en_attente' ? tr('En attente de retrait') : item.status === 'vendue' ? tr('Vendue') : tr('Retirée')} tone="accent" /> : null}
         </View>
         <H1 style={{ fontSize: 26 }}>{item.title}</H1>
         <Text style={{ fontSize: 28, fontWeight: '800', color: t.text }}>
