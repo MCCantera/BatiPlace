@@ -5,7 +5,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type SellerType = 'particulier' | 'entrepreneur' | 'fournisseur' | 'entreprise';
 export type ListingCondition = 'neuf' | 'usage' | 'surplus';
-export type ListingStatus = 'active' | 'vendue' | 'retiree';
+export type ListingStatus = 'active' | 'en_attente' | 'vendue' | 'retiree';
 
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;

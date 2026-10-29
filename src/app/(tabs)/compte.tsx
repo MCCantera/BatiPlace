@@ -16,7 +16,7 @@ type MyListing = Pick<Listing, 'id' | 'title' | 'price_cents' | 'price_unit' | '
   listing_photos: { path: string; position: number }[];
 };
 
-const STATUS_LABEL: Record<ListingStatus, string> = { active: 'Active', vendue: 'Vendue', retiree: 'Retirée' };
+const STATUS_LABEL: Record<ListingStatus, string> = { active: 'Active', en_attente: 'En attente de retrait', vendue: 'Vendue', retiree: 'Retirée' };
 
 export default function AccountScreen() {
   useSeo({ title: 'Mon compte', noindex: true });
@@ -136,14 +136,20 @@ function Account() {
                     {money(l.price_cents)} {tr(l.price_unit)} · {tr(l.views > 1 ? '{n} vues' : '{n} vue', { n: l.views })} · {timeAgo(l.created_at)}
                   </Text>
                   <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
-                    <Tag label={tr(STATUS_LABEL[l.status])} tone={l.status === 'active' ? 'ok' : 'neutral'} />
+                    <Tag label={tr(STATUS_LABEL[l.status])} tone={l.status === 'active' ? 'ok' : l.status === 'en_attente' ? 'accent' : 'neutral'} />
                   </View>
                 </View>
                 <View style={{ gap: 6 }}>
                   {l.status === 'active' ? (
                     <>
+                      <Button small kind="secondary" label={tr('En attente de retrait')} onPress={() => setStatus(l.id, 'en_attente')} />
                       <Button small kind="secondary" label={tr('Vendue')} onPress={() => setStatus(l.id, 'vendue')} />
                       <Button small kind="danger" label={tr('Retirer')} onPress={() => setStatus(l.id, 'retiree')} />
+                    </>
+                  ) : l.status === 'en_attente' ? (
+                    <>
+                      <Button small kind="secondary" label={tr('Vendue')} onPress={() => setStatus(l.id, 'vendue')} />
+                      <Button small kind="secondary" label={tr('Remettre active')} onPress={() => setStatus(l.id, 'active')} />
                     </>
                   ) : (
                     <Button small kind="secondary" label={tr('Réactiver')} onPress={() => setStatus(l.id, 'active')} />

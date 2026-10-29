@@ -56,6 +56,8 @@ const en: Record<string, string> = {
   Active: 'Active',
   Vendue: 'Sold',
   Retirée: 'Removed',
+  'En attente de retrait': 'Awaiting pickup',
+  'Remettre active': 'Make active again',
   Retirer: 'Remove',
   Réactiver: 'Reactivate',
   'Se déconnecter': 'Sign out',
