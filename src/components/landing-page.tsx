@@ -100,6 +100,13 @@ export function LandingPage({
             </Link>
           ))}
         </View>
+
+        <P muted>
+          {lang === 'en' ? 'Built in Montréal by ' : 'Conçu à Montréal par '}
+          <Link href="https://www.latelierdigital.ca/" style={{ color: t.accent, fontWeight: '600' }}>
+            L'Atelier Digital
+          </Link>
+        </P>
       </View>
     </Screen>
   );
