@@ -9,7 +9,7 @@ import { locale, useI18n } from '@/lib/i18n';
 import { buySubscription, purchasesAvailable, restorePurchases, storeName } from '@/lib/purchases';
 import { useSeo } from '@/lib/seo';
 import { supabase } from '@/lib/supabase';
-import { space, useTheme } from '@/lib/theme';
+import { space, type, useTheme } from '@/lib/theme';
 
 // Apple's standard licence agreement, required next to an auto-renewable subscription.
 const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
@@ -102,14 +102,14 @@ export default function SubscriptionScreen() {
         {tr('Le forfait gratuit permet {n} annonces actives. Avec Illimité, publiez autant que vous voulez.', { n: FREE_LISTING_LIMIT })}
       </P>
       <Card style={{ gap: space.md }}>
-        <Text style={{ fontSize: 40, fontWeight: '800', color: t.text }}>
-          {subscriptionPrice()} <Text style={{ fontSize: 16, fontWeight: '500', color: t.muted }}>{tr('/ mois, taxes en sus')}</Text>
+        <Text style={{ fontSize: 40, lineHeight: 46, fontWeight: '700', letterSpacing: -0.8, color: t.text }}>
+          {subscriptionPrice()} <Text style={[type.callout, { color: t.muted, letterSpacing: 0 }]}>{tr('/ mois, taxes en sus')}</Text>
         </Text>
-        <Text style={{ color: t.muted, fontSize: 14 }}>{tr('Durée : 1 mois, renouvelé automatiquement')}</Text>
+        <Text style={[type.footnote, { color: t.muted }]}>{tr('Durée : 1 mois, renouvelé automatiquement')}</Text>
         {PERKS.map((p) => (
-          <View key={p} style={{ flexDirection: 'row', gap: space.sm, alignItems: 'center' }}>
-            <Icon name="checkmark-circle" color={t.ok} />
-            <Text style={{ color: t.text, fontSize: 15 }}>{tr(p)}</Text>
+          <View key={p} style={{ flexDirection: 'row', gap: space.sm, alignItems: 'flex-start' }}>
+            <Icon name="checkmark-circle" size={20} color={t.ok} />
+            <Text style={[type.body, { color: t.text, flex: 1 }]}>{tr(p)}</Text>
           </View>
         ))}
       </Card>
@@ -146,17 +146,17 @@ export default function SubscriptionScreen() {
         <View style={{ gap: space.sm }}>
           <Button label={tr('S’abonner avec {store}', { store })} icon="card-outline" loading={busy} onPress={subscribe} disabled={!purchasesAvailable} />
           <Button kind="secondary" label={tr('Restaurer un achat')} onPress={restore} disabled={busy || !purchasesAvailable} />
-          <P muted style={{ fontSize: 12 }}>
+          <P muted style={type.footnote}>
             {tr('Abonnement mensuel renouvelé automatiquement, facturé à votre compte {store}. Annulable en tout temps dans les réglages de votre téléphone, au moins 24 h avant la fin de la période en cours.', { store })}
           </P>
           <View style={{ gap: space.sm }}>
-            <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accent, fontSize: 14, fontWeight: '600' }}>
+            <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={{ color: t.accentInk, fontSize: 15, fontWeight: '600' }}>
               {tr('Conditions d’utilisation (EULA)')}
             </Text>
-            <Text accessibilityRole="link" onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontSize: 14, fontWeight: '600' }}>
+            <Text accessibilityRole="link" onPress={() => router.push('/confidentialite')} style={{ color: t.accentInk, fontSize: 15, fontWeight: '600' }}>
               {tr('Politique de confidentialité')}
             </Text>
-            <Text accessibilityRole="link" onPress={() => router.push('/conditions')} style={{ color: t.accent, fontSize: 14, fontWeight: '600' }}>
+            <Text accessibilityRole="link" onPress={() => router.push('/conditions')} style={{ color: t.accentInk, fontSize: 15, fontWeight: '600' }}>
               {tr('Conditions de Bâtiplace')}
             </Text>
           </View>

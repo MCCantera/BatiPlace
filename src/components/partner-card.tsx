@@ -53,7 +53,7 @@ export function PartnerCard({ partner: p, stretch, linked }: { partner: Partner;
         </View>
       </View>
 
-      <Text style={{ color: t.accent, fontWeight: '800', fontSize: 20 }}>{p.offer}</Text>
+      <Text style={{ color: t.accentInk, fontWeight: '700', fontSize: 20, lineHeight: 25 }}>{p.offer}</Text>
       {p.description ? <P muted>{p.description}</P> : null}
 
       {place ? (

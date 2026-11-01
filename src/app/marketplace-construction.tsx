@@ -148,16 +148,16 @@ export default function MarketplaceScreen() {
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
-          <Link href="/entrepreneurs" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/entrepreneurs" style={{ color: t.accentInk, fontWeight: '600' }}>
             {c.contractors}
           </Link>
-          <Link href="/partenaires" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/partenaires" style={{ color: t.accentInk, fontWeight: '600' }}>
             {c.partners}
           </Link>
-          <Link href="/outils-usages" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/outils-usages" style={{ color: t.accentInk, fontWeight: '600' }}>
             {lang === 'en' ? 'Used tools' : 'Outils usagés et d’occasion'}
           </Link>
-          <Link href="/materiaux-usages" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/materiaux-usages" style={{ color: t.accentInk, fontWeight: '600' }}>
             {lang === 'en' ? 'Used materials' : 'Matériel et matériaux usagés'}
           </Link>
         </View>

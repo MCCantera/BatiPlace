@@ -65,7 +65,7 @@ export default function PrivacyScreen() {
           <H2>{tr('Nous joindre')}</H2>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             <P>{tr('Responsable de la protection des renseignements personnels : ')}</P>
-            <Text onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)} style={{ color: t.accent, fontWeight: '600', fontSize: 15 }}>
+            <Text onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)} style={{ color: t.accentInk, fontWeight: '600', fontSize: 15 }}>
               {CONTACT_EMAIL}
             </Text>
           </View>
