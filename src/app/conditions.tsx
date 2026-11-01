@@ -69,13 +69,13 @@ export default function TermsScreen() {
         </Card>
       ))}
       <Card style={{ gap: space.sm }}>
-        <Text onPress={() => Linking.openURL(APPLE_EULA_URL)} style={{ color: t.accent, fontWeight: '600', fontSize: 15 }}>
+        <Text onPress={() => Linking.openURL(APPLE_EULA_URL)} style={{ color: t.accentInk, fontWeight: '600', fontSize: 15 }}>
           {tr('Contrat de licence standard d’Apple (EULA)')}
         </Text>
         {CONTACT_EMAIL ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             <P>{tr('Questions : ')}</P>
-            <Text onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)} style={{ color: t.accent, fontWeight: '600', fontSize: 15 }}>
+            <Text onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)} style={{ color: t.accentInk, fontWeight: '600', fontSize: 15 }}>
               {CONTACT_EMAIL}
             </Text>
           </View>

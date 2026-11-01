@@ -24,7 +24,9 @@ function Navigator() {
     <Stack
       screenOptions={{
         headerTintColor: t.text,
-        headerStyle: { backgroundColor: t.surface },
+        // Barre de navigation fondue dans le fond de l'écran, comme les grands titres d'iOS.
+        headerStyle: { backgroundColor: t.bg },
+        headerTitleStyle: { fontSize: 17, fontWeight: '600' },
         headerShadowVisible: false,
         headerBackTitle: tr('Retour'),
         contentStyle: { backgroundColor: t.bg },
@@ -33,12 +35,12 @@ function Navigator() {
       <Stack.Screen name="annonce/[id]" options={{ title: tr('Annonce') }} />
       <Stack.Screen name="vendeur/[id]" options={{ title: tr('Vendeur') }} />
       <Stack.Screen name="conversation/[id]" options={{ title: 'Conversation' }} />
-      <Stack.Screen name="connexion" options={{ title: tr('Connexion'), presentation: 'modal' }} />
-      <Stack.Screen name="abonnement" options={{ title: tr('Bâtiplace Illimité'), presentation: 'modal' }} />
+      <Stack.Screen name="connexion" options={{ title: tr('Connexion'), presentation: 'modal', headerTitle: '' }} />
+      <Stack.Screen name="abonnement" options={{ title: tr('Bâtiplace Illimité'), presentation: 'modal', headerTitle: '' }} />
       <Stack.Screen name="profil" options={{ title: tr('Mon profil') }} />
-      <Stack.Screen name="partenaires" options={{ title: tr('Partenaires') }} />
+      <Stack.Screen name="partenaires" options={{ title: tr('Partenaires'), headerTitle: '' }} />
       <Stack.Screen name="partenaires/[slug]" options={{ title: tr('Partenaire') }} />
-      <Stack.Screen name="entrepreneurs" options={{ title: tr('Entrepreneurs') }} />
+      <Stack.Screen name="entrepreneurs" options={{ title: tr('Entrepreneurs'), headerTitle: '' }} />
       <Stack.Screen name="marketplace-construction" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="outils-usages" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="materiaux-usages" options={{ title: 'Bâtiplace' }} />
@@ -47,9 +49,9 @@ function Navigator() {
       <Stack.Screen name="portes-fenetres-usagees" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="machinerie-usagee" options={{ title: 'Bâtiplace' }} />
       <Stack.Screen name="plomberie-electricite-usagee" options={{ title: 'Bâtiplace' }} />
-      <Stack.Screen name="devenir-partenaire" options={{ title: tr('Devenir partenaire') }} />
-      <Stack.Screen name="confidentialite" options={{ title: tr('Confidentialité') }} />
-      <Stack.Screen name="conditions" options={{ title: tr('Conditions d’utilisation') }} />
+      <Stack.Screen name="devenir-partenaire" options={{ title: tr('Devenir partenaire'), headerTitle: '' }} />
+      <Stack.Screen name="confidentialite" options={{ title: tr('Confidentialité'), headerTitle: '' }} />
+      <Stack.Screen name="conditions" options={{ title: tr('Conditions d’utilisation'), headerTitle: '' }} />
     </Stack>
   );
 }

@@ -14,7 +14,7 @@ import { useI18n } from '@/lib/i18n';
 import { useOrigin } from '@/lib/location';
 import { useSeo } from '@/lib/seo';
 import { PHOTO_BUCKET, friendlyError, supabase } from '@/lib/supabase';
-import { radius, space, useTheme } from '@/lib/theme';
+import { radius, space, useTheme, type } from '@/lib/theme';
 
 const MAX_PHOTOS = 8;
 
@@ -222,7 +222,7 @@ function PublishForm() {
           {error ? <Notice icon="alert-circle-outline" tone="danger">{error}</Notice> : null}
           {limitHit ? <Button kind="secondary" label={tr('Voir l’abonnement')} onPress={() => router.push('/abonnement')} /> : null}
           <Button label={tr('Publier gratuitement')} icon="checkmark" loading={busy} onPress={submit} />
-          <P muted style={{ fontSize: 13 }}>{tr('Aucune commission : l’acheteur vous paie directement.')}</P>
+          <P muted style={type.footnote}>{tr('Aucune commission : l’acheteur vous paie directement.')}</P>
         </Card>
       )}
     </Screen>

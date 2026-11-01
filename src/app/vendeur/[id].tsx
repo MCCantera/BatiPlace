@@ -12,7 +12,7 @@ import { useFavorites } from '@/lib/favorites';
 import { locale, useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, supabase } from '@/lib/supabase';
-import { space, useTheme } from '@/lib/theme';
+import { space, useTheme, type } from '@/lib/theme';
 
 type SellerListing = Pick<Listing, 'id' | 'title' | 'price_cents' | 'price_unit' | 'city' | 'condition' | 'category_id' | 'spec'> & {
   listing_photos: { path: string; position: number }[];
@@ -101,7 +101,7 @@ export default function SellerScreen() {
           <View style={{ flexDirection: 'row', gap: 6 }}>
             <Tag label={sellerTypeLabel(profile.seller_type)} tone={profile.seller_type === 'particulier' ? 'neutral' : 'brand'} />
           </View>
-          <H1 style={{ fontSize: 26 }}>{profile.display_name || tr('Membre Bâtiplace')}</H1>
+          <H1 style={type.title2}>{profile.display_name || tr('Membre Bâtiplace')}</H1>
           <P muted>
             {profile.city ? `${profile.city} · ` : ''}{tr('Membre depuis {year}', { year: new Date(profile.created_at).getFullYear() })}
           </P>

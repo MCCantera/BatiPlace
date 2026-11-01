@@ -49,7 +49,7 @@ export default function PartnerScreen() {
             offer: partner.offer,
           })}
         </P>
-        <Link href="/partenaires" style={{ color: t.accent, fontWeight: '600' }}>
+        <Link href="/partenaires" style={{ color: t.accentInk, fontWeight: '600' }}>
           {tr('Voir tous les partenaires')}
         </Link>
       </View>

@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { category } from '@/lib/catalog';
 import { useI18n } from '@/lib/i18n';
-import { MAX_WIDTH, radius, space, useTheme } from '@/lib/theme';
+import { MAX_WIDTH, TOUCH, radius, space, type, useTheme } from '@/lib/theme';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -72,6 +72,15 @@ export function H2({ children, style }: { children: ReactNode; style?: StyleProp
   );
 }
 
+export function H3({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+  const t = useTheme();
+  return (
+    <Text role="heading" aria-level={3} style={[type.headline, { color: t.text }, style]}>
+      {children}
+    </Text>
+  );
+}
+
 export function P({
   children,
   muted,
@@ -120,16 +129,17 @@ export function Button({
       accessibilityRole="button"
       onPress={onPress}
       disabled={disabled || loading}
+      hitSlop={small ? 4 : undefined}
       style={({ pressed }) => [
         styles.button,
         small && styles.buttonSmall,
         { backgroundColor: bg, borderColor: kind === 'secondary' || kind === 'danger' ? t.line : bg },
         (disabled || loading) && { opacity: 0.5 },
-        pressed && { opacity: 0.85 },
+        pressed && { opacity: 0.7 },
         style,
       ]}>
-      {loading ? <ActivityIndicator color={fg} /> : icon ? <Ionicons name={icon} size={small ? 15 : 18} color={fg} /> : null}
-      <Text style={[styles.buttonText, small && { fontSize: 14 }, { color: fg }]}>{label}</Text>
+      {loading ? <ActivityIndicator color={fg} /> : icon ? <Ionicons name={icon} size={small ? 16 : 19} color={fg} /> : null}
+      <Text style={[styles.buttonText, small && styles.buttonTextSmall, { color: fg }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -151,12 +161,14 @@ export function Chip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[
+      hitSlop={4}
+      style={({ pressed }) => [
         styles.chip,
+        pressed && { opacity: 0.7 },
         { backgroundColor: selected ? t.brand : t.surface, borderColor: selected ? t.brand : t.line },
       ]}>
       {dot ? <View style={[styles.dot, { backgroundColor: dot }]} /> : null}
-      <Text style={{ color: selected ? t.brandText : t.text, fontWeight: '500', fontSize: 14 }}>{label}</Text>
+      <Text style={[type.subhead, { color: selected ? t.brandText : t.text, fontWeight: selected ? '600' : '500' }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -167,7 +179,7 @@ export function Tag({ label, tone = 'neutral' }: { label: string; tone?: 'neutra
   const fg = { neutral: t.muted, ok: t.ok, accent: t.text, brand: t.brandText }[tone];
   return (
     <View style={[styles.tag, { backgroundColor: bg }]}>
-      <Text style={{ color: fg, fontSize: 12, fontWeight: '600' }}>{label}</Text>
+      <Text style={[type.caption, { color: fg, fontWeight: '600' }]}>{label}</Text>
     </View>
   );
 }
@@ -176,7 +188,7 @@ export function Field({ label, hint, ...props }: TextInputProps & { label: strin
   const t = useTheme();
   return (
     <View style={{ gap: space.xs }}>
-      <Text style={{ color: t.text, fontWeight: '600', fontSize: 14 }}>{label}</Text>
+      <Text style={[type.subhead, { color: t.text, fontWeight: '600' }]}>{label}</Text>
       <TextInput
         placeholderTextColor={t.muted}
         {...props}
@@ -187,7 +199,7 @@ export function Field({ label, hint, ...props }: TextInputProps & { label: strin
           props.style,
         ]}
       />
-      {hint ? <Text style={{ color: t.muted, fontSize: 12 }}>{hint}</Text> : null}
+      {hint ? <Text style={[type.footnote, { color: t.muted }]}>{hint}</Text> : null}
     </View>
   );
 }
@@ -203,7 +215,7 @@ export function Notice({ children, icon = 'information-circle-outline', tone = '
   return (
     <View style={[styles.notice, { backgroundColor: bg }]}>
       <Ionicons name={icon} size={18} color={tone === 'danger' ? t.danger : t.text} />
-      <Text style={{ color: t.text, flex: 1, fontSize: 14, lineHeight: 20 }}>{children}</Text>
+      <Text style={[type.subhead, { color: t.text, flex: 1 }]}>{children}</Text>
     </View>
   );
 }
@@ -212,7 +224,7 @@ export function Empty({ title, body, action }: { title: string; body?: string; a
   const t = useTheme();
   return (
     <View style={[styles.empty, { borderColor: t.line, backgroundColor: t.surface }]}>
-      <Text style={{ color: t.text, fontWeight: '700', fontSize: 16, textAlign: 'center' }}>{title}</Text>
+      <Text style={[type.headline, { color: t.text, textAlign: 'center' }]}>{title}</Text>
       {body ? <P muted style={{ textAlign: 'center' }}>{body}</P> : null}
       {action}
     </View>
@@ -266,7 +278,7 @@ export function Avatar({ name, size = 44, color, uri }: { name: string; size?: n
       .join('') || '?';
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color ?? t.brand, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: '#fff', fontWeight: '800', fontSize: size * 0.38 }}>{initials}</Text>
+      <Text style={{ color: '#fff', fontWeight: '700', fontSize: size * 0.38 }}>{initials}</Text>
     </View>
   );
 }
@@ -284,19 +296,92 @@ export function Stars({ value, size = 14 }: { value: number; size?: number }) {
   );
 }
 
+/**
+ * Liste groupée façon Réglages d'iOS (« inset grouped ») : rangées de 44 pt minimum,
+ * séparateurs fins alignés sur le texte, chevron à droite.
+ */
+export function ListGroup({ title, children, style }: { title?: string; children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const t = useTheme();
+  return (
+    <View style={[{ gap: space.sm }, style]}>
+      {title ? <Text style={[type.footnote, styles.groupTitle, { color: t.muted }]}>{title}</Text> : null}
+      <View style={[styles.group, { backgroundColor: t.surface, borderColor: t.line }]}>{children}</View>
+    </View>
+  );
+}
+
+export function ListRow({
+  label,
+  detail,
+  icon,
+  iconBg,
+  onPress,
+  right,
+  destructive,
+  first,
+}: {
+  label: string;
+  detail?: string;
+  icon?: IconName;
+  /** Couleur de la pastille de l'icône (comme dans Réglages). */
+  iconBg?: string;
+  onPress?: () => void;
+  right?: ReactNode;
+  destructive?: boolean;
+  /** La première rangée n'a pas de séparateur au-dessus. */
+  first?: boolean;
+}) {
+  const t = useTheme();
+  const color = destructive ? t.danger : t.text;
+  const content = (
+    <>
+      {icon ? (
+        <View style={[styles.rowIcon, { backgroundColor: iconBg ?? t.surface2 }]}>
+          <Ionicons name={icon} size={18} color={iconBg ? '#fff' : color} />
+        </View>
+      ) : null}
+      <View style={[styles.rowBody, !first && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: t.line }]}>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <Text style={[type.body, { color }]}>{label}</Text>
+          {detail ? <Text style={[type.footnote, { color: t.muted }]}>{detail}</Text> : null}
+        </View>
+        {right}
+        {onPress && !right ? <Ionicons name="chevron-forward" size={18} color={t.muted} /> : null}
+      </View>
+    </>
+  );
+  return onPress ? (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.row, pressed && { backgroundColor: t.surface2 }]}>
+      {content}
+    </Pressable>
+  ) : (
+    <View style={styles.row}>{content}</View>
+  );
+}
+
 const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center', paddingHorizontal: space.lg, paddingTop: space.lg, gap: space.lg },
-  h1: { fontSize: 28, fontWeight: '800', letterSpacing: -0.4 },
-  h2: { fontSize: 20, fontWeight: '700', letterSpacing: -0.2 },
-  p: { fontSize: 15, lineHeight: 22 },
-  button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.sm, paddingVertical: 12, paddingHorizontal: 20, borderRadius: radius.pill, borderWidth: 1 },
-  buttonSmall: { paddingVertical: 7, paddingHorizontal: 14 },
-  buttonText: { fontWeight: '700', fontSize: 16 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1 },
-  dot: { width: 9, height: 9, borderRadius: 5 },
-  tag: { paddingVertical: 2, paddingHorizontal: 9, borderRadius: radius.pill, alignSelf: 'flex-start' },
-  input: { borderWidth: 1, borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: 11, fontSize: 16 },
+  h1: type.title1,
+  h2: { ...type.title2 },
+  p: type.body,
+  // Bouton plein : 50 pt de haut (taille « large » d'iOS) ; petit bouton : 36 pt + marge tactile.
+  button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.sm, minHeight: 50, paddingVertical: space.sm, paddingHorizontal: space.xl, borderRadius: radius.pill, borderWidth: 1 },
+  buttonSmall: { minHeight: 36, paddingVertical: space.xs, paddingHorizontal: space.lg },
+  buttonText: { ...type.headline, textAlign: 'center', flexShrink: 1 },
+  buttonTextSmall: { ...type.subhead, fontWeight: '600' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  tag: { paddingVertical: 2, paddingHorizontal: space.sm, borderRadius: radius.pill, alignSelf: 'flex-start' },
+  input: { borderWidth: 1, borderRadius: radius.md, paddingHorizontal: space.md, minHeight: TOUCH + 4, paddingVertical: space.md, fontSize: 17 },
   card: { borderWidth: 1, borderRadius: radius.lg, padding: space.lg, gap: space.md },
+  groupTitle: { textTransform: 'uppercase', letterSpacing: 0.4, paddingHorizontal: space.lg },
+  group: { borderWidth: 1, borderRadius: radius.lg, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', paddingLeft: space.lg, gap: space.md, minHeight: TOUCH + 8 },
+  rowIcon: { width: 30, height: 30, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  rowBody: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm, alignSelf: 'stretch', paddingVertical: space.md, paddingRight: space.lg },
   notice: { flexDirection: 'row', gap: space.sm, padding: space.md, borderRadius: radius.md, alignItems: 'flex-start' },
   empty: { borderWidth: 1, borderStyle: 'dashed', borderRadius: radius.lg, padding: space.xl, gap: space.sm, alignItems: 'center' },
 });

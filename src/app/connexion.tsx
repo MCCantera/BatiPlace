@@ -6,7 +6,7 @@ import { Button, Card, Chip, Field, H1, Notice, P, Screen } from '@/components/u
 import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, isSupabaseConfigured, supabase } from '@/lib/supabase';
-import { space, useTheme } from '@/lib/theme';
+import { space, useTheme, type } from '@/lib/theme';
 
 export default function SignInScreen() {
   useSeo({ title: 'Connexion', noindex: true });
@@ -84,13 +84,13 @@ export default function SignInScreen() {
         <Button label={mode === 'login' ? tr('Se connecter') : tr('Créer mon compte')} loading={busy} onPress={submit} />
         {mode === 'login' ? <Button kind="secondary" label={tr('Mot de passe oublié')} onPress={forgot} /> : null}
       </Card>
-      <P muted style={{ fontSize: 13 }}>
+      <P muted style={type.footnote}>
         {tr('En créant un compte, vous acceptez les conditions d’utilisation et la politique de confidentialité de Bâtiplace.')}{' '}
-        <Text onPress={() => router.push('/conditions')} style={{ color: t.accent, fontWeight: '600' }}>
+        <Text onPress={() => router.push('/conditions')} style={{ color: t.accentInk, fontWeight: '600' }}>
           {tr('Conditions d’utilisation')}
         </Text>
         {' · '}
-        <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accent, fontWeight: '600' }}>
+        <Text onPress={() => router.push('/confidentialite')} style={{ color: t.accentInk, fontWeight: '600' }}>
           {tr('Politique de confidentialité')}
         </Text>
       </P>

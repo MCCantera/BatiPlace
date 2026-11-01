@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CityField } from '@/components/city-field';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ListingCard } from '@/components/listing-card';
-import { Button, Chip, Empty, Icon, Loading, P } from '@/components/ui';
+import { Button, Chip, Empty, Icon, Loading, Notice } from '@/components/ui';
 import { CATEGORIES, CITY_NAMES, CONDITIONS, category, conditionLabel, money } from '@/lib/catalog';
 import type { ListingCondition, SearchResult } from '@/lib/database.types';
 import { useFavorites } from '@/lib/favorites';
@@ -15,7 +15,7 @@ import { useOrigin } from '@/lib/location';
 import { useSeo } from '@/lib/seo';
 import { parseSmartQuery, type SmartQuery } from '@/lib/smart-search';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
-import { radius, space, useTheme } from '@/lib/theme';
+import { TOUCH, radius, space, type, useTheme } from '@/lib/theme';
 
 const RADII = [10, 25, 50, 100, 250, 1500];
 const SORTS = [
@@ -118,87 +118,69 @@ export default function ExploreScreen() {
   const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
   const header = (
-    <View style={{ gap: space.md, paddingBottom: space.md }}>
+    <View style={{ gap: wide ? space.lg : space.md, paddingBottom: space.md }}>
       <View style={styles.brandRow}>
         <View style={[styles.mark, { backgroundColor: t.accent }]}>
-          <Icon name="home" size={30} color="#fff" />
+          <Icon name="home" size={wide ? 28 : 24} color="#fff" />
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 34, fontWeight: '800', color: t.text, letterSpacing: -0.8, lineHeight: 38 }}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={[type.largeTitle, { color: t.text, fontWeight: '800' }]}>
             Bâti<Text style={{ color: t.brand }}>place</Text>
           </Text>
-          <Text role="heading" aria-level={1} style={{ fontSize: 15, color: t.muted }}>
+          <Text role="heading" aria-level={1} style={[type.footnote, { color: t.muted }]}>
             {tr('Le marketplace de la construction au Québec')}
           </Text>
         </View>
         <LanguageToggle />
       </View>
 
-      <View style={[styles.hero, { backgroundColor: t.accentSoft }]}>
-        <Text role="heading" aria-level={2} style={{ fontSize: 24, fontWeight: '800', color: t.text, letterSpacing: -0.4 }}>
-          {tr('Le surplus des uns,')} <Text style={{ color: t.accent }}>{tr('le chantier des autres.')}</Text>
+      {/* Hiérarchie : le message, puis tout de suite la recherche (l'action principale), visible sans défiler. */}
+      <View style={[styles.hero, { backgroundColor: t.accentSoft }, wide && { padding: space.xl }]}>
+        <Text role="heading" aria-level={2} style={[wide ? type.title1 : type.title2, { color: t.text, fontWeight: '800' }]}>
+          {tr('Le surplus des uns,')} <Text style={{ color: t.accentInk }}>{tr('le chantier des autres.')}</Text>
         </Text>
-        <P muted>
+        <Text style={[wide ? type.body : type.subhead, { color: t.muted, maxWidth: 720 }]}>
           {tr(
             'Achetez et vendez matériaux, outils et équipements neufs ou usagés, entre voisins, particuliers et professionnels, partout au Québec. Publication gratuite, zéro commission.',
           )}{' '}
-          <Link href="/marketplace-construction" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/marketplace-construction" style={{ color: t.accentInk, fontWeight: '600' }}>
             {tr('Comment ça marche ?')}
           </Link>
-        </P>
-        <Pressable
-          accessibilityRole="link"
-          onPress={() => router.push('/partenaires')}
-          style={({ pressed }) => [styles.partners, { backgroundColor: t.surface }, pressed && { opacity: 0.85 }]}>
-          <Icon name="pricetags-outline" size={18} color={t.accent} />
-          <Text style={{ color: t.text, fontWeight: '700', flexShrink: 1 }}>{tr('Rabais exclusifs chez nos partenaires')}</Text>
-          <Icon name="chevron-forward" size={16} color={t.muted} />
-        </Pressable>
-      </View>
+        </Text>
 
-      <Pressable
-        accessibilityRole="link"
-        onPress={() => router.push('/entrepreneurs')}
-        style={({ pressed }) => [styles.contractors, { backgroundColor: t.brand }, pressed && { opacity: 0.9 }]}>
-        <Icon name="construct-outline" size={26} color={t.brandText} />
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={{ color: t.brandText, fontWeight: '800', fontSize: 17 }}>{tr('Vous cherchez un entrepreneur ?')}</Text>
-          <Text style={{ color: t.brandText, opacity: 0.85 }}>{tr('Trouvez un pro avec notre partenaire RenoGo.')}</Text>
+        <View style={[styles.search, { backgroundColor: t.surface, borderColor: t.line }]}>
+          <Icon name="sparkles" color={t.accent} />
+          <TextInput
+            value={q}
+            onChangeText={(v) => {
+              setQ(v);
+              if (!v.trim()) clearSearch();
+            }}
+            onSubmitEditing={runSearch}
+            placeholder={tr('Ex. : je cherche de la céramique à Laval')}
+            placeholderTextColor={t.muted}
+            style={{ flex: 1, minWidth: 0, fontSize: 17, color: t.text, paddingVertical: space.sm }}
+            returnKeyType="search"
+            accessibilityLabel={tr('Rechercher')}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={tr('Rechercher')}
+            onPress={runSearch}
+            style={({ pressed }) => [styles.searchBtn, { backgroundColor: t.accent }, pressed && { opacity: 0.7 }]}>
+            <Icon name="search" size={18} color={t.accentText} />
+            {wide ? <Text style={[type.headline, { color: t.accentText }]}>{tr('Rechercher')}</Text> : null}
+          </Pressable>
         </View>
-        <Icon name="chevron-forward" color={t.brandText} />
-      </Pressable>
-
-      <View style={[styles.search, { backgroundColor: t.surface, borderColor: t.line }]}>
-        <Icon name="sparkles" color={t.accent} />
-        <TextInput
-          value={q}
-          onChangeText={(v) => {
-            setQ(v);
-            if (!v.trim()) clearSearch();
-          }}
-          onSubmitEditing={runSearch}
-          placeholder={tr('Ex. : je cherche de la céramique à Laval')}
-          placeholderTextColor={t.muted}
-          style={{ flex: 1, minWidth: 0, fontSize: 16, color: t.text, paddingVertical: 8 }}
-          returnKeyType="search"
-          accessibilityLabel={tr('Rechercher')}
-        />
-        <Pressable
-          accessibilityRole="button"
-          onPress={runSearch}
-          style={({ pressed }) => [styles.searchBtn, { backgroundColor: t.accent }, pressed && { opacity: 0.85 }]}>
-          <Icon name="search" size={16} color={t.accentText} />
-          <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 15 }}>{tr('Rechercher')}</Text>
-        </Pressable>
       </View>
 
       {smart ? (
         <View style={[styles.assistant, { backgroundColor: t.surface2 }]}>
           <Icon name="sparkles" size={18} color={t.accent} />
           <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Text style={{ color: t.text, fontWeight: '600' }}>{assistantSummary(smart, origin.label)}</Text>
+            <Text style={[type.subhead, { color: t.text, fontWeight: '600' }]}>{assistantSummary(smart, origin.label)}</Text>
             {fallback ? (
-              <Text style={{ color: t.muted, fontSize: 13 }}>
+              <Text style={[type.footnote, { color: t.muted }]}>
                 {tr('Aucune annonce ne mentionne « {words} » pour l’instant. Voici les annonces de {cats}.', {
                   words: smart.keywords.join(' '),
                   cats: smart.categories.map((c) => tr(category(c).name)).join(', '),
@@ -206,53 +188,89 @@ export default function ExploreScreen() {
               </Text>
             ) : null}
           </View>
-          <Pressable accessibilityRole="button" accessibilityLabel={tr('Effacer la recherche')} onPress={clearSearch} hitSlop={8}>
+          <Pressable accessibilityRole="button" accessibilityLabel={tr('Effacer la recherche')} onPress={clearSearch} hitSlop={12}>
             <Icon name="close" size={18} color={t.muted} />
           </Pressable>
         </View>
       ) : null}
 
-      <View style={styles.row}>
-        <Pressable onPress={() => setPicker(true)} style={[styles.locBtn, { borderColor: t.line, backgroundColor: t.surface }]}>
-          <Icon name={origin.fromDevice ? 'navigate' : 'location-outline'} color={t.brand} />
-          <Text style={{ color: t.text, fontWeight: '600' }}>{origin.label}</Text>
-          <Icon name="chevron-down" size={14} color={t.muted} />
+      {/* Raccourcis secondaires (partenaires) : même poids visuel, côte à côte sur ordinateur. */}
+      <View style={[styles.shortcuts, wide && { flexDirection: 'row' }]}>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push('/entrepreneurs')}
+          style={({ pressed }) => [styles.shortcut, { backgroundColor: t.brand }, wide && { flex: 1 }, pressed && { opacity: 0.85 }]}>
+          <Icon name="construct-outline" size={22} color={t.brandText} />
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={[wide ? type.headline : styles.shortcutTitle, { color: t.brandText }]}>{tr('Vous cherchez un entrepreneur ?').replace(' ?', '\u00A0?')}</Text>
+            <Text style={[type.footnote, { color: t.brandText, opacity: 0.85 }]}>{tr('Trouvez un pro avec notre partenaire RenoGo.')}</Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={t.brandText} />
         </Pressable>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push('/partenaires')}
+          style={({ pressed }) => [styles.shortcut, { backgroundColor: t.surface, borderColor: t.line, borderWidth: 1 }, wide && { flex: 1 }, pressed && { opacity: 0.85 }]}>
+          <Icon name="pricetags-outline" size={22} color={t.accent} />
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={[wide ? type.headline : styles.shortcutTitle, { color: t.text }]}>{tr('Rabais exclusifs chez nos partenaires')}</Text>
+          </View>
+          <Icon name="chevron-forward" size={18} color={t.muted} />
+        </Pressable>
+      </View>
+
+      <View style={{ gap: space.md }}>
+        <View style={styles.row}>
+          <Pressable onPress={() => setPicker(true)} style={[styles.locBtn, { borderColor: t.line, backgroundColor: t.surface }]}>
+            <Icon name={origin.fromDevice ? 'navigate' : 'location-outline'} color={t.brand} />
+            <Text style={[type.subhead, { color: t.text, fontWeight: '600' }]}>{origin.label}</Text>
+            <Icon name="chevron-down" size={14} color={t.muted} />
+          </Pressable>
+          <ChipRow wide={wide}>
+            {RADII.map((r) => (
+              <Chip key={r} label={r >= 1500 ? tr('Tout le Québec') : `${r} km`} selected={radiusKm === r} onPress={() => setRadiusKm(r)} />
+            ))}
+          </ChipRow>
+        </View>
+
         <ChipRow wide={wide}>
-          {RADII.map((r) => (
-            <Chip key={r} label={r >= 1500 ? tr('Tout le Québec') : `${r} km`} selected={radiusKm === r} onPress={() => setRadiusKm(r)} />
+          <Chip label={tr('Tout')} selected={cats.length === 0} onPress={() => setCats([])} />
+          {CATEGORIES.map((c) => (
+            <Chip key={c.id} label={tr(c.name)} dot={c.ink} selected={cats.includes(c.id)} onPress={() => setCats(toggle(cats, c.id))} />
           ))}
         </ChipRow>
-      </View>
 
-      <ChipRow wide={wide}>
-        <Chip label={tr('Tout')} selected={cats.length === 0} onPress={() => setCats([])} />
-        {CATEGORIES.map((c) => (
-          <Chip key={c.id} label={tr(c.name)} dot={c.ink} selected={cats.includes(c.id)} onPress={() => setCats(toggle(cats, c.id))} />
-        ))}
-      </ChipRow>
-
-      <ChipRow wide={wide}>
-        {CONDITIONS.map((c) => (
-          <Chip key={c.id} label={tr(c.label)} selected={conds.includes(c.id)} onPress={() => setConds(toggle(conds, c.id))} />
-        ))}
-        <Chip label={tr('Particuliers')} selected={proOnly === false} onPress={() => setProOnly(proOnly === false ? null : false)} />
-        <Chip label={tr('Professionnels')} selected={proOnly === true} onPress={() => setProOnly(proOnly === true ? null : true)} />
-      </ChipRow>
-
-      <View style={[styles.row, { justifyContent: 'space-between' }]}>
-        <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700', flexShrink: 0 }}>
-          {results ? tr(results.length > 1 ? '{n} annonces' : '{n} annonce', { n: results.length }) : ' '}
-        </Text>
-        <ChipRow wide={wide} gap={space.xs}>
-          {SORTS.map((s) => (
-            <Pressable key={s.id} onPress={() => setSort(s.id)} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
-              <Text style={{ color: sort === s.id ? t.accent : t.muted, fontWeight: sort === s.id ? '700' : '500', fontSize: 13 }}>{tr(s.label)}</Text>
-            </Pressable>
+        <ChipRow wide={wide}>
+          {CONDITIONS.map((c) => (
+            <Chip key={c.id} label={tr(c.label)} selected={conds.includes(c.id)} onPress={() => setConds(toggle(conds, c.id))} />
           ))}
+          <Chip label={tr('Particuliers')} selected={proOnly === false} onPress={() => setProOnly(proOnly === false ? null : false)} />
+          <Chip label={tr('Professionnels')} selected={proOnly === true} onPress={() => setProOnly(proOnly === true ? null : true)} />
         </ChipRow>
+
+        <View style={[styles.row, { justifyContent: 'space-between' }]}>
+          <Text numberOfLines={1} style={[type.headline, { color: t.text, flexShrink: 0 }]}>
+            {results ? tr(results.length > 1 ? '{n} annonces' : '{n} annonce', { n: results.length }) : ' '}
+          </Text>
+          <ChipRow wide={wide} gap={space.xs}>
+            {SORTS.map((s) => (
+              <Pressable
+                key={s.id}
+                accessibilityRole="button"
+                accessibilityState={{ selected: sort === s.id }}
+                onPress={() => setSort(s.id)}
+                style={[styles.sort, sort === s.id && { backgroundColor: t.surface2 }]}>
+                <Text style={[type.footnote, { color: sort === s.id ? t.text : t.muted, fontWeight: sort === s.id ? '600' : '400' }]}>{tr(s.label)}</Text>
+              </Pressable>
+            ))}
+          </ChipRow>
+        </View>
       </View>
-      {error ? <P style={{ color: t.danger }}>{error}</P> : null}
+      {error ? (
+        <Notice tone="danger" icon="cloud-offline-outline">
+          {error}
+        </Notice>
+      ) : null}
     </View>
   );
 
@@ -293,7 +311,7 @@ export default function ExploreScreen() {
       <Modal visible={picker} transparent animationType="fade" onRequestClose={() => setPicker(false)}>
         <Pressable style={styles.overlay} onPress={() => setPicker(false)}>
           <Pressable style={[styles.sheet, { backgroundColor: t.surface }]}>
-            <Text style={{ fontSize: 18, fontWeight: '800', color: t.text }}>{tr('Rechercher autour de')}</Text>
+            <Text style={[type.title3, { color: t.text }]}>{tr('Rechercher autour de')}</Text>
             <Button
               label={tr('Utiliser ma position')}
               icon="navigate"
@@ -312,7 +330,7 @@ export default function ExploreScreen() {
                 setPicker(false);
               }}
             />
-            <Text style={{ color: t.muted, fontSize: 13, fontWeight: '600' }}>{tr('Grandes villes')}</Text>
+            <Text style={[type.footnote, { color: t.muted, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 }]}>{tr('Grandes villes')}</Text>
             <ScrollView style={{ maxHeight: 300 }}>
               {CITY_NAMES.map((c) => (
                 <Pressable
@@ -322,7 +340,7 @@ export default function ExploreScreen() {
                     setPicker(false);
                   }}
                   style={[styles.cityRow, { borderColor: t.line }]}>
-                  <Text style={{ color: t.text, fontSize: 16, fontWeight: origin.label === c ? '700' : '400' }}>{c}</Text>
+                  <Text style={[type.body, { color: t.text, fontWeight: origin.label === c ? '600' : '400' }]}>{c}</Text>
                   {origin.label === c ? <Icon name="checkmark" color={t.accent} /> : null}
                 </Pressable>
               ))}
@@ -348,16 +366,18 @@ function assistantSummary(s: SmartQuery, place: string) {
 
 const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
-  mark: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
-  hero: { borderRadius: radius.lg, padding: space.lg, gap: space.sm },
-  contractors: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderRadius: radius.lg, paddingHorizontal: space.lg, paddingVertical: space.md },
-  partners: { flexDirection: 'row', alignItems: 'center', gap: space.sm, alignSelf: 'flex-start', borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, marginTop: space.xs },
-  search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingLeft: space.lg, paddingRight: 5, paddingVertical: 5 },
-  searchBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 9 },
+  mark: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-6deg' }] },
+  hero: { borderRadius: radius.lg, padding: space.lg, gap: space.md },
+  shortcuts: { gap: space.md },
+  shortcut: { flexDirection: 'row', alignItems: 'center', gap: space.md, borderRadius: radius.lg, paddingHorizontal: space.lg, paddingVertical: space.md, minHeight: 56 },
+  shortcutTitle: { ...type.subhead, fontWeight: '600' },
+  search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, borderWidth: 1, borderRadius: radius.pill, paddingLeft: space.lg, paddingRight: space.xs, paddingVertical: space.xs, marginTop: space.xs },
+  searchBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: radius.pill, minWidth: TOUCH, height: TOUCH, paddingHorizontal: space.md },
+  sort: { minHeight: 32, justifyContent: 'center', paddingHorizontal: space.md, borderRadius: radius.pill },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   assistant: { flexDirection: 'row', alignItems: 'flex-start', gap: space.sm, borderRadius: radius.md, padding: space.md },
-  locBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 },
+  locBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: space.md, minHeight: 36 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: space.lg },
   sheet: { borderRadius: radius.lg, padding: space.lg, gap: space.md, width: '100%', maxWidth: 440, alignSelf: 'center' },
-  cityRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth },
+  cityRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: TOUCH, borderBottomWidth: StyleSheet.hairlineWidth },
 });
