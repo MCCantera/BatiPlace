@@ -17,6 +17,22 @@ export const LANDING_LINKS = [
   ['/plomberie-electricite-usagee', 'Plomberie et électricité', 'Plumbing and electrical'],
 ] as const;
 
+/** The SEO page written for each category; the others open Explorer filtered on it. */
+const CATEGORY_PAGES: Record<string, string> = {
+  materiaux: '/materiaux-usages',
+  surplus: '/surplus-de-chantier',
+  outils: '/outils-usages',
+  machinerie: '/machinerie-usagee',
+  plomberie: '/plomberie-electricite-usagee',
+  electricite: '/plomberie-electricite-usagee',
+  'portes-fenetres': '/portes-fenetres-usagees',
+  bois: '/bois-usage',
+};
+
+export function categoryHref(id: string) {
+  return CATEGORY_PAGES[id] ?? `/?categorie=${id}`;
+}
+
 export type LandingContent = {
   h1: string;
   intro: string;
