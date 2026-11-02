@@ -23,7 +23,7 @@ export default function TabsLayout() {
         tabBarActiveTintColor: t.accent,
         tabBarInactiveTintColor: t.muted,
         tabBarStyle: { backgroundColor: t.surface, borderTopColor: t.line },
-        tabBarLabelStyle: { fontWeight: '600' },
+        tabBarLabelStyle: { fontWeight: '500' },
       }}>
       <Tabs.Screen name="index" options={{ title: tr('Explorer'), tabBarIcon: icon('search-outline', 'search') }} />
       <Tabs.Screen name="favoris" options={{ title: tr('Favoris'), tabBarIcon: icon('heart-outline', 'heart') }} />

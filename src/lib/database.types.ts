@@ -5,7 +5,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type SellerType = 'particulier' | 'entrepreneur' | 'fournisseur' | 'entreprise';
 export type ListingCondition = 'neuf' | 'usage' | 'surplus';
-export type ListingStatus = 'active' | 'vendue' | 'retiree';
+export type ListingStatus = 'active' | 'en_attente' | 'vendue' | 'retiree';
 
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
@@ -223,6 +223,7 @@ export type Database = {
       increment_listing_view: { Args: { listing: string }; Returns: undefined };
       has_active_subscription: { Args: { uid: string }; Returns: boolean };
       partner_promo_code: { Args: { partner: string }; Returns: string | null };
+      redeem_promo_code: { Args: { p_code: string }; Returns: string };
       is_blocked_between: { Args: { a: string; b: string }; Returns: boolean };
     };
     Enums: {

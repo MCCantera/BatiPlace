@@ -107,11 +107,11 @@ export function LandingPage({
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
-          <Link href="/marketplace-construction" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/marketplace-construction" style={{ color: t.accentInk, fontWeight: '600' }}>
             {lang === 'en' ? 'The construction marketplace in Québec' : 'Le marketplace de la construction au Québec'}
           </Link>
           {LANDING_LINKS.filter(([path]) => path !== seo.path).map(([path, fr, en]) => (
-            <Link key={path} href={path} style={{ color: t.accent, fontWeight: '600' }}>
+            <Link key={path} href={path} style={{ color: t.accentInk, fontWeight: '600' }}>
               {lang === 'en' ? en : fr}
             </Link>
           ))}

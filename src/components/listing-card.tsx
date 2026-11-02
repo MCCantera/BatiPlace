@@ -7,7 +7,7 @@ import { conditionLabel, distanceLabel, money } from '@/lib/catalog';
 import type { SearchResult } from '@/lib/database.types';
 import { useI18n } from '@/lib/i18n';
 import { photoUrl } from '@/lib/supabase';
-import { radius, space, useTheme } from '@/lib/theme';
+import { radius, space, type, useTheme } from '@/lib/theme';
 
 type CardListing = Pick<
   SearchResult,
@@ -38,7 +38,7 @@ export function ListingCard({
           <ListingImage uri={photoUrl(listing.photo_path)} categoryId={listing.category_id} style={styles.image} />
           {listing.boosted ? (
             <View style={[styles.badge, { backgroundColor: t.accent }]}>
-              <Text style={{ color: t.accentText, fontWeight: '700', fontSize: 12 }}>{tr('En vedette')}</Text>
+              <Text style={[type.caption, { color: t.accentText, fontWeight: '700' }]}>{tr('En vedette')}</Text>
             </View>
           ) : null}
           {onToggleFavorite ? (
@@ -49,7 +49,7 @@ export function ListingCard({
                 e.preventDefault();
                 onToggleFavorite();
               }}
-              hitSlop={8}
+              hitSlop={6}
               style={styles.fav}>
               <Icon name={favorite ? 'heart' : 'heart-outline'} color={favorite ? t.danger : '#1e2a24'} />
             </Pressable>
@@ -58,16 +58,16 @@ export function ListingCard({
         <View style={styles.body}>
           <Text style={[styles.price, { color: t.text }]}>
             {money(listing.price_cents)}
-            {listing.price_unit ? <Text style={{ fontSize: 12, color: t.muted, fontWeight: '500' }}> {tr(listing.price_unit)}</Text> : null}
+            {listing.price_unit ? <Text style={[type.caption, { color: t.muted }]}> {tr(listing.price_unit)}</Text> : null}
           </Text>
-          <Text numberOfLines={2} style={{ color: t.text, fontSize: 15, fontWeight: '500', lineHeight: 20 }}>
+          <Text numberOfLines={2} style={[type.subhead, { color: t.text }]}>
             {listing.title}
           </Text>
-          <Text numberOfLines={1} style={{ color: t.muted, fontSize: 13 }}>
+          <Text numberOfLines={1} style={[type.footnote, { color: t.muted }]}>
             {listing.city}
             {listing.distance_km != null ? ` · ${distanceLabel(listing.distance_km)}` : ''}
           </Text>
-          <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
+          <View style={{ flexDirection: 'row', gap: space.xs, flexWrap: 'wrap', marginTop: space.xs }}>
             <Tag label={conditionLabel(listing.condition)} tone={listing.condition === 'neuf' ? 'ok' : listing.condition === 'surplus' ? 'accent' : 'neutral'} />
             {pro ? <Tag label={tr('Pro')} tone="brand" /> : null}
           </View>
@@ -80,8 +80,8 @@ export function ListingCard({
 const styles = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: radius.lg, overflow: 'hidden', flex: 1 },
   image: { aspectRatio: 4 / 3, width: '100%' },
-  badge: { position: 'absolute', top: 10, left: 10, paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill },
-  fav: { position: 'absolute', top: 8, right: 8, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' },
-  body: { padding: space.md, gap: 3 },
-  price: { fontSize: 19, fontWeight: '800' },
+  badge: { position: 'absolute', top: space.sm, left: space.sm, paddingHorizontal: space.sm, paddingVertical: space.xs, borderRadius: radius.pill },
+  fav: { position: 'absolute', top: space.sm, right: space.sm, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' },
+  body: { padding: space.md, gap: space.xs },
+  price: { ...type.title3, fontWeight: '700' },
 });

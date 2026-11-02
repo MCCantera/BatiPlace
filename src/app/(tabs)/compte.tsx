@@ -3,20 +3,20 @@ import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LanguageToggle } from '@/components/language-toggle';
-import { Avatar, Button, Card, Empty, H1, H2, ListingImage, Loading, P, Screen, Tag } from '@/components/ui';
+import { Avatar, Button, Card, Empty, H1, H2, ListGroup, ListRow, ListingImage, Loading, P, Screen, Tag } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { FREE_LISTING_LIMIT, money, sellerTypeLabel, subscriptionPrice, timeAgo } from '@/lib/catalog';
 import type { Listing, ListingStatus } from '@/lib/database.types';
 import { useI18n } from '@/lib/i18n';
 import { useSeo } from '@/lib/seo';
 import { friendlyError, photoUrl, supabase } from '@/lib/supabase';
-import { radius, space, useTheme } from '@/lib/theme';
+import { radius, space, type, useTheme } from '@/lib/theme';
 
 type MyListing = Pick<Listing, 'id' | 'title' | 'price_cents' | 'price_unit' | 'status' | 'views' | 'created_at' | 'category_id'> & {
   listing_photos: { path: string; position: number }[];
 };
 
-const STATUS_LABEL: Record<ListingStatus, string> = { active: 'Active', vendue: 'Vendue', retiree: 'Retirée' };
+const STATUS_LABEL: Record<ListingStatus, string> = { active: 'Active', en_attente: 'En attente de retrait', vendue: 'Vendue', retiree: 'Retirée' };
 
 export default function AccountScreen() {
   useSeo({ title: 'Mon compte', noindex: true });
@@ -26,13 +26,11 @@ export default function AccountScreen() {
 
 /** Language row, shown at the top of the account screen whether or not the user is signed in. */
 function LanguageRow() {
-  const t = useTheme();
   const { tr } = useI18n();
   return (
-    <View style={[styles.langRow, { backgroundColor: t.surface, borderColor: t.line }]}>
-      <Text style={{ color: t.text, fontWeight: '600', fontSize: 15 }}>{tr('Langue')}</Text>
-      <LanguageToggle />
-    </View>
+    <ListGroup>
+      <ListRow first icon="language-outline" label={tr('Langue')} right={<LanguageToggle />} />
+    </ListGroup>
   );
 }
 
@@ -90,8 +88,8 @@ function Account() {
       <LanguageRow />
       <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.lg, flexWrap: 'wrap' }}>
         <Avatar name={name} uri={profile?.avatar_url} size={64} />
-        <View style={{ flex: 1, minWidth: 180, gap: 4 }}>
-          <H1 style={{ fontSize: 24 }}>{name}</H1>
+        <View style={{ flex: 1, minWidth: 180, gap: space.xs }}>
+          <H1 style={type.title2}>{name}</H1>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
             {profile ? <Tag label={sellerTypeLabel(profile.seller_type)} tone={profile.seller_type === 'particulier' ? 'neutral' : 'brand'} /> : null}
             {profile?.city ? <Tag label={profile.city} /> : null}
@@ -125,25 +123,34 @@ function Account() {
             const photo = [...l.listing_photos].sort((a, b) => a.position - b.position)[0]?.path;
             return (
               <View key={l.id} style={[styles.row, { backgroundColor: t.surface, borderColor: t.line }]}>
-                <ListingImage uri={photoUrl(photo)} categoryId={l.category_id} style={styles.thumb} iconSize={26} />
-                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-                  <Link href={{ pathname: '/annonce/[id]', params: { id: l.id } }} asChild>
-                    <Pressable>
-                      <Text numberOfLines={1} style={{ color: t.text, fontWeight: '700' }}>{l.title}</Text>
-                    </Pressable>
-                  </Link>
-                  <Text style={{ color: t.muted, fontSize: 13 }}>
-                    {money(l.price_cents)} {tr(l.price_unit)} · {tr(l.views > 1 ? '{n} vues' : '{n} vue', { n: l.views })} · {timeAgo(l.created_at)}
-                  </Text>
-                  <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
-                    <Tag label={tr(STATUS_LABEL[l.status])} tone={l.status === 'active' ? 'ok' : 'neutral'} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                  <ListingImage uri={photoUrl(photo)} categoryId={l.category_id} style={styles.thumb} iconSize={26} />
+                  <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                    <Link href={{ pathname: '/annonce/[id]', params: { id: l.id } }} asChild>
+                      <Pressable>
+                        <Text numberOfLines={1} style={[type.headline, { color: t.text }]}>{l.title}</Text>
+                      </Pressable>
+                    </Link>
+                    <Text style={[type.footnote, { color: t.muted }]}>
+                      {money(l.price_cents)} {tr(l.price_unit)} · {tr(l.views > 1 ? '{n} vues' : '{n} vue', { n: l.views })} · {timeAgo(l.created_at)}
+                    </Text>
+                    <View style={{ flexDirection: 'row', gap: space.xs, flexWrap: 'wrap', marginTop: space.xs }}>
+                      <Tag label={tr(STATUS_LABEL[l.status])} tone={l.status === 'active' ? 'ok' : l.status === 'en_attente' ? 'accent' : 'neutral'} />
+                    </View>
                   </View>
                 </View>
-                <View style={{ gap: 6 }}>
+                {/* Actions sous l'annonce, en ligne : plus lisible qu'une pile de petits boutons à droite. */}
+                <View style={styles.actions}>
                   {l.status === 'active' ? (
                     <>
+                      <Button small kind="secondary" label={tr('En attente de retrait')} onPress={() => setStatus(l.id, 'en_attente')} />
                       <Button small kind="secondary" label={tr('Vendue')} onPress={() => setStatus(l.id, 'vendue')} />
                       <Button small kind="danger" label={tr('Retirer')} onPress={() => setStatus(l.id, 'retiree')} />
+                    </>
+                  ) : l.status === 'en_attente' ? (
+                    <>
+                      <Button small kind="secondary" label={tr('Vendue')} onPress={() => setStatus(l.id, 'vendue')} />
+                      <Button small kind="secondary" label={tr('Remettre active')} onPress={() => setStatus(l.id, 'active')} />
                     </>
                   ) : (
                     <Button small kind="secondary" label={tr('Réactiver')} onPress={() => setStatus(l.id, 'active')} />
@@ -155,17 +162,19 @@ function Account() {
         </View>
       )}
 
-      <View style={{ gap: space.sm, marginTop: space.lg }}>
-        <Button kind="secondary" label={tr('Se déconnecter')} icon="log-out-outline" onPress={signOut} />
-        <Button kind="secondary" small label={tr('Politique de confidentialité')} icon="shield-checkmark-outline" onPress={() => router.push('/confidentialite')} />
-        <Button kind="secondary" small label={tr('Conditions d’utilisation')} icon="document-text-outline" onPress={() => router.push('/conditions')} />
-      </View>
+      <ListGroup style={{ marginTop: space.lg }}>
+        <ListRow first icon="shield-checkmark-outline" label={tr('Politique de confidentialité')} onPress={() => router.push('/confidentialite')} />
+        <ListRow icon="document-text-outline" label={tr('Conditions d’utilisation')} onPress={() => router.push('/conditions')} />
+      </ListGroup>
+      <ListGroup>
+        <ListRow first icon="log-out-outline" label={tr('Se déconnecter')} destructive onPress={signOut} right={<View />} />
+      </ListGroup>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.md, borderWidth: 1, borderRadius: radius.lg },
+  row: { gap: space.md, padding: space.md, borderWidth: 1, borderRadius: radius.lg },
   thumb: { width: 64, height: 64, borderRadius: radius.sm },
-  langRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md, paddingHorizontal: space.md, paddingVertical: space.sm, borderWidth: 1, borderRadius: radius.lg },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
 });

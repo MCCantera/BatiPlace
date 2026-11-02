@@ -35,7 +35,7 @@ type ListingForSeo = {
   description: string;
   city: string;
   condition: 'neuf' | 'usage' | 'surplus';
-  status: 'active' | 'vendue' | 'retiree';
+  status: 'active' | 'en_attente' | 'vendue' | 'retiree';
   price_cents: number;
   price_unit: string;
 };

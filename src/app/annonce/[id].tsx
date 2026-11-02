@@ -11,7 +11,7 @@ import { useFavorites } from '@/lib/favorites';
 import { useI18n } from '@/lib/i18n';
 import { listingSeo, useSeo } from '@/lib/seo';
 import { friendlyError, photoUrl, supabase } from '@/lib/supabase';
-import { radius, space, useTheme } from '@/lib/theme';
+import { radius, space, type, useTheme } from '@/lib/theme';
 
 type Detail = Listing & {
   seller: Pick<Profile, 'id' | 'display_name' | 'seller_type' | 'city' | 'rbq_license' | 'rbq_verified' | 'avatar_url'> | null;
@@ -117,17 +117,17 @@ export default function ListingScreen() {
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           <Tag label={conditionLabel(item.condition)} tone={item.condition === 'neuf' ? 'ok' : item.condition === 'surplus' ? 'accent' : 'neutral'} />
           <Tag label={tr(cat.name)} />
-          {item.status !== 'active' ? <Tag label={item.status === 'vendue' ? tr('Vendue') : tr('Retirée')} tone="accent" /> : null}
+          {item.status !== 'active' ? <Tag label={item.status === 'en_attente' ? tr('En attente de retrait') : item.status === 'vendue' ? tr('Vendue') : tr('Retirée')} tone="accent" /> : null}
         </View>
-        <H1 style={{ fontSize: 26 }}>{item.title}</H1>
-        <Text style={{ fontSize: 28, fontWeight: '800', color: t.text }}>
-          {money(item.price_cents)} <Text style={{ fontSize: 14, color: t.muted, fontWeight: '500' }}>{tr(item.price_unit)}</Text>
+        <H1 style={type.title2}>{item.title}</H1>
+        <Text style={[type.title1, { color: t.text }]}>
+          {money(item.price_cents)} <Text style={[type.subhead, { color: t.muted }]}>{tr(item.price_unit)}</Text>
         </Text>
         <View style={[styles.facts, { borderColor: t.line }]}>
           {facts.map(([k, v]) => (
-            <View key={k} style={{ width: '50%', paddingVertical: 6 }}>
-              <Text style={{ color: t.muted, fontSize: 12 }}>{k}</Text>
-              <Text style={{ color: t.text, fontWeight: '500' }}>{v}</Text>
+            <View key={k} style={{ width: '50%', paddingVertical: space.sm, paddingRight: space.sm, gap: 2 }}>
+              <Text style={[type.footnote, { color: t.muted }]}>{k}</Text>
+              <Text style={[type.subhead, { color: t.text, fontWeight: '500' }]}>{v}</Text>
             </View>
           ))}
         </View>
@@ -161,21 +161,21 @@ export default function ListingScreen() {
             <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
               <Avatar name={item.seller.display_name} uri={item.seller.avatar_url} />
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={{ color: t.text, fontWeight: '700' }}>{item.seller.display_name || tr('Membre Bâtiplace')}</Text>
-                <Text style={{ color: t.muted, fontSize: 13 }}>
+                <Text style={[type.headline, { color: t.text }]}>{item.seller.display_name || tr('Membre Bâtiplace')}</Text>
+                <Text style={[type.footnote, { color: t.muted }]}>
                   {sellerTypeLabel(item.seller.seller_type)}
                   {item.seller.city ? ` · ${item.seller.city}` : ''}
                 </Text>
                 {rating ? (
                   <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
                     <Stars value={rating.average} />
-                    <Text style={{ color: t.muted, fontSize: 12 }}>({rating.count})</Text>
+                    <Text style={[type.caption, { color: t.muted }]}>({rating.count})</Text>
                   </View>
                 ) : (
-                  <Text style={{ color: t.muted, fontSize: 12 }}>{tr('Nouveau vendeur')}</Text>
+                  <Text style={[type.caption, { color: t.muted }]}>{tr('Nouveau vendeur')}</Text>
                 )}
                 {item.seller.rbq_verified && item.seller.rbq_license ? (
-                  <Text style={{ color: t.ok, fontSize: 12, fontWeight: '600' }}>{tr('Licence RBQ {n} vérifiée', { n: item.seller.rbq_license })}</Text>
+                  <Text style={[type.caption, { color: t.ok, fontWeight: '600' }]}>{tr('Licence RBQ {n} vérifiée', { n: item.seller.rbq_license })}</Text>
                 ) : null}
               </View>
               <Icon name="chevron-forward" color={t.muted} />
@@ -191,9 +191,9 @@ export default function ListingScreen() {
         <Pressable
           accessibilityRole="button"
           onPress={() => (userId ? setReporting(true) : router.push('/connexion'))}
-          style={{ flexDirection: 'row', gap: 6, alignItems: 'center', alignSelf: 'center', padding: space.sm }}>
+          style={{ flexDirection: 'row', gap: 6, alignItems: 'center', alignSelf: 'center', minHeight: 44, paddingHorizontal: space.md }}>
           <Icon name="flag-outline" size={16} color={t.muted} />
-          <Text style={{ color: t.muted, fontWeight: '600' }}>{tr('Signaler l’annonce ou bloquer le vendeur')}</Text>
+          <Text style={[type.subhead, { color: t.muted, fontWeight: '600' }]}>{tr('Signaler l’annonce ou bloquer le vendeur')}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -216,7 +216,7 @@ export default function ListingScreen() {
           {gallery}
           {!wide ? summary : null}
           <Card>
-            <Text style={{ color: t.text, fontWeight: '700', fontSize: 18 }}>{tr('Description')}</Text>
+            <Text role="heading" aria-level={2} style={[type.title3, { color: t.text }]}>{tr('Description')}</Text>
             <P>{item.description || tr('Aucune description.')}</P>
           </Card>
         </View>

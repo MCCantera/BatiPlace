@@ -151,14 +151,14 @@ export default function MarketplaceScreen() {
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
-          <Link href="/entrepreneurs" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/entrepreneurs" style={{ color: t.accentInk, fontWeight: '600' }}>
             {c.contractors}
           </Link>
-          <Link href="/partenaires" style={{ color: t.accent, fontWeight: '600' }}>
+          <Link href="/partenaires" style={{ color: t.accentInk, fontWeight: '600' }}>
             {c.partners}
           </Link>
           {LANDING_LINKS.map(([path, fr, en]) => (
-            <Link key={path} href={path} style={{ color: t.accent, fontWeight: '600' }}>
+            <Link key={path} href={path} style={{ color: t.accentInk, fontWeight: '600' }}>
               {lang === 'en' ? en : fr}
             </Link>
           ))}

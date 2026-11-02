@@ -30,6 +30,14 @@ const en: Record<string, string> = {
   'Nos premiers entrepreneurs partenaires arrivent bientôt': 'Our first partner contractors are coming soon',
   'Les entrepreneurs approuvés par Bâtiplace apparaîtront ici.': 'Contractors approved by Bâtiplace will appear here.',
   'Vous êtes entrepreneur ?': 'Are you a contractor?',
+  'Bâtiplace s’associe à RenoGo pour vous aider à trouver un pro près de chez vous pour vos travaux.':
+    'Bâtiplace has partnered with RenoGo to help you find a pro near you for your project.',
+  'Trouvez votre entrepreneur avec RenoGo': 'Find your contractor with RenoGo',
+  'Trouvez un entrepreneur pour vos travaux de construction ou de rénovation, partout au Québec.':
+    'Find a contractor for your construction or renovation project, anywhere in Québec.',
+  'Aller sur RenoGo': 'Go to RenoGo',
+  'Faites-vous connaître auprès de nouveaux clients sur RenoGo.': 'Reach new clients on RenoGo.',
+  'S’inscrire sur RenoGo': 'Sign up on RenoGo',
   'Envoyez-nous une demande de partenariat pour apparaître sur cette page.': 'Send us a partnership request to appear on this page.',
   'Demander un partenariat': 'Request a partnership',
   'Licence RBQ vérifiée': 'Verified RBQ licence',
